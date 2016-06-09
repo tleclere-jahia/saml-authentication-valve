@@ -99,7 +99,7 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
 
 
                 final SamlClient client = SamlClient.fromMetadata(reader,
-                        "https://192.168.33.99:8443/idp/shibboleth",
+                        "https://idp.jahia.com/idp/shibboleth",
                         signCert);
 
                 // To process the POST containing the SAML response

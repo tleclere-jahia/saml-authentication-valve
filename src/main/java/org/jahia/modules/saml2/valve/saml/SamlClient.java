@@ -258,19 +258,14 @@ public class SamlClient {
         final IDPSSODescriptor idpSsoDescriptor = getIDPSSODescriptor(entityDescriptor);
         final SingleSignOnService postBinding = getPostBinding(idpSsoDescriptor);
         final X509Certificate x509Certificate = getCertificate(idpSsoDescriptor);
-        boolean isOkta = entityDescriptor.getEntityID().contains(".okta.com");
 
         if (relyingPartyIdentifier == null) {
             // Okta's own toolkit uses the entity ID as a relying party identifier, so if we
             // detect that the IDP is Okta let's tolerate a null value for this parameter.
-            if (isOkta) {
-                relyingPartyIdentifier = entityDescriptor.getEntityID();
-            } else {
-                throw new IllegalArgumentException("relyingPartyIdentifier");
-            }
+            throw new IllegalArgumentException("relyingPartyIdentifier");
         }
 
-        if (assertionConsumerServiceUrl == null && isOkta) {
+        if (assertionConsumerServiceUrl == null) {
             // Again, Okta's own toolkit uses this value for the assertion consumer url, which
             // kinda makes no sense since this is supposed to be a url pointing to a server
             // outside Okta, but it probably just straight ignores this and use the one from
