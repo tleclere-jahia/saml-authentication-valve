@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:osgi="http://www.eclipse.org/gemini/blueprint/schema/blueprint"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-        http://www.eclipse.org/gemini/blueprint/schema/blueprint http://www.eclipse.org/gemini/blueprint/schema/blueprint/gemini-blueprint.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+        http://www.eclipse.org/gemini/blueprint/schema/blueprint http://www.eclipse.org/gemini/blueprint/schema/blueprint/gemini-blueprint.xsd">
 
     <osgi:service id="userManagerService"
                   interface="org.jahia.services.usermanager.JahiaUserManagerService">
@@ -15,11 +15,38 @@
     <!--Authentication Valve Declarations-->
     <bean class="org.jahia.modules.saml2.valve.AuthenticationValve">
         <property name="position" value="2"/>
-        <!--<property name="userManagerService" ref="JahiaUserManagerService"/>-->
+        <property name="saml2SettingsService" ref="saml2SettingsService"/>
     </bean>
 
-    <bean class="org.jahia.modules.saml2.valve.MetadataAction" >
+    <bean class="org.jahia.modules.saml2.valve.MetadataAction">
         <property name="name" value="metadata"/>
         <property name="requireAuthenticatedUser" value="false"/>
+        <property name="saml2SettingsService" ref="saml2SettingsService"/>
+    </bean>
+
+    <bean class="org.jahia.modules.saml2.admin.SAML2SettingsListener">
+        <property name="workspace" value="default"/>
+    </bean>
+
+    <bean class="org.jahia.modules.saml2.admin.SAML2SettingsChangedListener">
+        <property name="saml2SettingsService" ref="saml2SettingsService"/>
+    </bean>
+
+    <bean id="saml2SettingsService" class="org.jahia.modules.saml2.admin.SAML2SettingsService"
+          factory-method="getInstance">
+    </bean>
+
+    <bean class="org.jahia.modules.saml2.admin.SAML2SettingsFilter">
+        <property name="description" value="Injects saml2 context info in admin UI"/>
+        <property name="applyOnModes" value="settings,edit,preview"/>
+        <property name="priority" value="2"/>
+        <property name="applyOnTemplates" value="saml2"/>
+        <property name="saml2SettingsService" ref="saml2SettingsService"/>
+    </bean>
+
+    <bean id="saml2SettingsAction" class="org.jahia.modules.saml2.admin.SAML2SettingsAction">
+        <property name="name" value="saml2Settings"/>
+        <property name="requiredPermission" value="canSetupSaml2"/>
+        <property name="saml2SettingsService" ref="saml2SettingsService"/>
     </bean>
 </beans>

@@ -1,0 +1,54 @@
+<md-toolbar>
+  <div class="md-toolbar-tools">
+    <h2 message-key="saml2nt_settings"></h2>
+    <span flex></span>
+    <md-button class="md-icon-button" aria-label="Favorite" ng-click="save()">
+      <md-icon aria-label="accessibility"
+               class="material-icons step"
+               ng-class="md-18">save
+      </md-icon>
+    </md-button>
+  </div>
+</md-toolbar>
+
+<md-tabs class="ma-tabs" md-border-bottom ng-cloak md-dynamic-height>
+  <md-tab label="Base" ng-cloak layout="column" layout-align="space-around">
+    <md-card flex="80" flex-offset="10" ng-cloak>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline"
+                message-key="angular.saml2.directives.settings.ma-settings.subtitle.saml2Setting"></span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <md-checkbox ng-model="settings.enabled" aria-label="" ng-click="enable()">
+          <span message-key="saml2nt_settings.saml2_enabled"></span>
+        </md-checkbox>
+        <md-input-container class="md-block" flex>
+          <label message-key="saml2nt_settings.saml2_identityProviderUrl"></label>
+          <input ng-model="settings.identityProviderUrl">
+        </md-input-container>
+        <md-input-container class="md-block" flex>
+          <label message-key="saml2nt_settings.saml2_relyingPartyIdentifier"></label>
+          <input ng-model="settings.relyingPartyIdentifier">
+        </md-input-container>
+        <md-input-container class="md-block" flex>
+          <label message-key="saml2nt_settings.saml2_incomingTargetUrl"></label>
+          <input ng-model="settings.incomingTargetUrl">
+        </md-input-container>
+        <md-input-container class="md-block" flex>
+          <label message-key="saml2nt_settings.saml2_idpMetaDataLocation"></label>
+          <input ng-model="settings.idpMetaDataLocation">
+        </md-input-container>
+        <md-input-container class="md-block" flex>
+          <label message-key="saml2nt_settings.saml2_signingCertLocation"></label>
+          <input ng-model="settings.signingCertLocation">
+        </md-input-container>
+        <md-input-container class="md-block" flex>
+          <label message-key="saml2nt_settings.saml2_encryptionCertLocation"></label>
+          <input ng-model="settings.encryptionCertLocation">
+        </md-input-container>
+      </md-card-content>
+    </md-card>
+  </md-tab>
+</md-tabs>

@@ -45,8 +45,8 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -57,9 +57,11 @@
     <groupId>org.jahia.modules</groupId>
     <artifactId>saml-authentication-valve</artifactId>
     <name>SAML Authenication Valve</name>
-    <version>1.0-SNAPSHOT</version>    
+    <version>1.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <description>This is the custom module (SAML Authenication Valve) for running on a Digital Experience Manager server.</description>
+    <description>This is the custom module (SAML Authenication Valve) for running on a Digital Experience Manager
+        server.
+    </description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -105,6 +107,22 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>jahia-maven-plugin</artifactId>
+                <groupId>org.jahia.server</groupId>
+                <executions>
+                    <execution>
+                        <id>i18n2js</id>
+                        <goals>
+                            <goal>javascript-dictionary</goal>
+                        </goals>
+                        <configuration>
+                            <dictionaryName>saml2i18n</dictionaryName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
