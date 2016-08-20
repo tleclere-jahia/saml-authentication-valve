@@ -2,7 +2,8 @@ package org.jahia.modules.saml2.valve;
 
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
-import org.jahia.modules.saml2.Constants;
+import org.jahia.modules.saml2.admin.SAML2Settings;
+import org.jahia.modules.saml2.admin.SAML2SettingsService;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
@@ -49,7 +50,19 @@ import java.util.Map;
  */
 public class MetadataAction extends Action {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetadataAction.class);
+    private SAML2SettingsService saml2SettingsService;
 
+    /**
+     *
+     * @param req
+     * @param renderContext
+     * @param resource
+     * @param session
+     * @param parameters
+     * @param urlResolver
+     * @return
+     * @throws Exception
+     */
     @Override
     public ActionResult doExecute(final HttpServletRequest req,
                                   final RenderContext renderContext,
@@ -58,11 +71,16 @@ public class MetadataAction extends Action {
                                   final Map<String, List<String>> parameters,
                                   final URLResolver urlResolver) throws Exception {
         try {
+            if (renderContext.getSite() == null) {
+                return ActionResult.OK;
+            }
+            final String siteKey = renderContext.getSite().getSiteKey();
+            final SAML2Settings saml2Settings = saml2SettingsService.getSettings(siteKey);
             // initialize the opensaml library
             DefaultBootstrap.bootstrap();
 
             final EntityDescriptor spEntityDescriptor = SAMLUtil.buildSAMLObjectWithDefaultName(EntityDescriptor.class);
-            spEntityDescriptor.setEntityID(Constants.RELYING_PARTY_IDENTIFIER);
+            spEntityDescriptor.setEntityID(saml2Settings.getRelyingPartyIdentifier());
             final SPSSODescriptor spSSODescriptor = SAMLUtil.buildSAMLObjectWithDefaultName(SPSSODescriptor.class);
 //            spSSODescriptor.setWantAssertionsSigned(false);
 //            spSSODescriptor.setAuthnRequestsSigned(false);
@@ -76,7 +94,7 @@ public class MetadataAction extends Action {
             encKeyDescriptor.setUse(UsageType.ENCRYPTION); //Set usage
 
             // jtc - signature and credential
-            final InputStream encInStream = new FileInputStream(new File("/opt/shibboleth-idp/credentials/idp-encryption.crt"));
+            final InputStream encInStream = new FileInputStream(new File(saml2Settings.getEncryptionCertLocation()));
             // position 0 has the key file
             final X509Certificate encCert = new X509CertImpl(encInStream);
             final BasicX509Credential encCredential = new BasicX509Credential();
@@ -91,7 +109,7 @@ public class MetadataAction extends Action {
             signKeyDescriptor.setUse(UsageType.SIGNING);  //Set usage
 
             // Generating key info. The element will contain the public key. The key is used to by the IDP to verify signatures
-            final InputStream signInStream = new FileInputStream(new File("/opt/shibboleth-idp/credentials/idp-signing.crt"));
+            final InputStream signInStream = new FileInputStream(new File(saml2Settings.getSigningCertLocation()));
             // position 0 has the key file
             final X509Certificate signCert = new X509CertImpl(signInStream);
             final BasicX509Credential signCredential = new BasicX509Credential();
@@ -110,7 +128,7 @@ public class MetadataAction extends Action {
             assertionConsumerService.setIsDefault(true);
             assertionConsumerService.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
             // Setting address for our AssertionConsumerService
-            assertionConsumerService.setLocation(Constants.CMS_LOGIN_SAML_INCOMING);
+            assertionConsumerService.setLocation(SAMLUtil.getAssertionConsumerServiceUrl(req));
 
             spSSODescriptor.getAssertionConsumerServices().add(assertionConsumerService);
             spSSODescriptor.addSupportedProtocol(SAMLConstants.SAML20P_NS);
@@ -140,5 +158,9 @@ public class MetadataAction extends Action {
         }
 
         return ActionResult.OK;
+    }
+
+    public void setSaml2SettingsService(SAML2SettingsService saml2SettingsService) {
+        this.saml2SettingsService = saml2SettingsService;
     }
 }

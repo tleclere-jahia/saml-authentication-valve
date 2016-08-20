@@ -186,8 +186,8 @@ public class SamlClient {
             final DOMParser parser = new DOMParser();
             parser.parse(new InputSource(new StringReader(decodedResponse)));
             response = (Response) Configuration.getUnmarshallerFactory()
-                                    .getUnmarshaller(parser.getDocument().getDocumentElement())
-                                    .unmarshall(parser.getDocument().getDocumentElement());
+                    .getUnmarshaller(parser.getDocument().getDocumentElement())
+                    .unmarshall(parser.getDocument().getDocumentElement());
         } catch (IOException | SAXException | UnmarshallingException ex) {
             throw new SamlException("Cannot decode xml encoded response", ex);
         }
@@ -215,8 +215,6 @@ public class SamlClient {
         if (relayState != null) {
             values.put("RelayState", relayState);
         }
-
-        values.put("redirectUrl", "http://www.cnn.com");
         BrowserUtils.postUsingBrowser(identityProviderUrl, response, values);
     }
 
