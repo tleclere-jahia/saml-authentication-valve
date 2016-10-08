@@ -18,7 +18,7 @@
         <property name="saml2SettingsService" ref="saml2SettingsService"/>
     </bean>
 
-    <bean class="org.jahia.modules.saml2.valve.MetadataAction">
+    <bean class="org.jahia.modules.saml2.actions.MetadataAction">
         <property name="name" value="metadata"/>
         <property name="requireAuthenticatedUser" value="false"/>
         <property name="saml2SettingsService" ref="saml2SettingsService"/>

@@ -11,9 +11,10 @@
  - saml2:identityProviderUrl (string) nofulltext
  - saml2:relyingPartyIdentifier (string) nofulltext
  - saml2:incomingTargetUrl (string) nofulltext
- - saml2:idpMetaDataLocation (string) nofulltext
- - saml2:signingCertLocation (string) nofulltext
- - saml2:encryptionCertLocation (string) nofulltext
+ - saml2:spMetaDataLocation (string) nofulltext
+ - saml2:keyStoreLocation (string) nofulltext
+ - saml2:keyStorePass (string) nofulltext
+ - saml2:privateKeyPass (string) nofulltext
 
 [saml2nt:manageSettings] > jnt:content, jmix:siteComponent, mix:title, jmix:studioOnly
 

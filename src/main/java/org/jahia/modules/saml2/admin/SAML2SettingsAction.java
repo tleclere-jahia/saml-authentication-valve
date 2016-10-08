@@ -81,15 +81,18 @@ public class SAML2SettingsAction extends Action {
                         (oldSettings != null ? oldSettings.getRelyingPartyIdentifier() : ""));
                 final String incomingTargetUrl = getSettingOrDefault(settings, SAML2Constants.INCOMING_TARGET_URL,
                         (oldSettings != null ? oldSettings.getIncomingTargetUrl() : ""));
-                final String idpMetaDataLocation = getSettingOrDefault(settings, SAML2Constants.IDP_META_DATA_LOCATION,
-                        (oldSettings != null ? oldSettings.getIdpMetaDataLocation() : ""));
-                final String signingCertLocation = getSettingOrDefault(settings, SAML2Constants.SIGNING_CERT_LOCATION,
-                        (oldSettings != null ? oldSettings.getSigningCertLocation() : ""));
-                final String encryptionCertLocation = getSettingOrDefault(settings, SAML2Constants.ENCRYPTION_CERT_LOCATION,
-                        (oldSettings != null ? oldSettings.getEncryptionCertLocation() : ""));
+                final String spMetaDataLocation = getSettingOrDefault(settings, SAML2Constants.SP_META_DATA_LOCATION,
+                        (oldSettings != null ? oldSettings.getSpMetaDataLocation() : ""));
+                final String keyStoreLocation = getSettingOrDefault(settings, SAML2Constants.KEY_STORE_LOCATION,
+                        (oldSettings != null ? oldSettings.getKeyStoreLocation() : ""));
+                final String keyStorePass = getSettingOrDefault(settings, SAML2Constants.KEY_STORE_PASS,
+                        (oldSettings != null ? oldSettings.getKeyStorePass() : ""));
+                final String privateKeyPass = getSettingOrDefault(settings, SAML2Constants.PRIVATE_KEY_PASS,
+                        (oldSettings != null ? oldSettings.getPrivateKeyPass() : ""));
                 if (enabled) {
                     serverSettings = saml2SettingsService.setSAML2Settings(siteKey,
-                            identityProviderUrl, relyingPartyIdentifier, incomingTargetUrl, idpMetaDataLocation, signingCertLocation, encryptionCertLocation);
+                            identityProviderUrl, relyingPartyIdentifier, incomingTargetUrl,
+                            spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass);
                 } else {
                     serverSettings = null;
                 }
@@ -103,9 +106,10 @@ public class SAML2SettingsAction extends Action {
                 resp.put(SAML2Constants.IDENTITY_PROVIDER_URL, serverSettings.getIdentityProviderUrl());
                 resp.put(SAML2Constants.RELYING_PARTY_IDENTIFIER, serverSettings.getRelyingPartyIdentifier());
                 resp.put(SAML2Constants.INCOMING_TARGET_URL, serverSettings.getIncomingTargetUrl());
-                resp.put(SAML2Constants.IDP_META_DATA_LOCATION, serverSettings.getIdpMetaDataLocation());
-                resp.put(SAML2Constants.SIGNING_CERT_LOCATION, serverSettings.getSigningCertLocation());
-                resp.put(SAML2Constants.ENCRYPTION_CERT_LOCATION, serverSettings.getEncryptionCertLocation());
+                resp.put(SAML2Constants.SP_META_DATA_LOCATION, serverSettings.getSpMetaDataLocation());
+                resp.put(SAML2Constants.KEY_STORE_LOCATION, serverSettings.getKeyStoreLocation());
+                resp.put(SAML2Constants.KEY_STORE_PASS, serverSettings.getKeyStorePass());
+                resp.put(SAML2Constants.PRIVATE_KEY_PASS, serverSettings.getPrivateKeyPass());
             }
             resp.put("noConf", serverSettings == null);
             return new ActionResult(HttpServletResponse.SC_OK, null, resp);
