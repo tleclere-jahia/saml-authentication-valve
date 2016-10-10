@@ -19,14 +19,15 @@ import java.io.IOException;
 public class SAML2Settings {
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Settings.class);
 
-    private String siteKey;
     private boolean enabled;
+    private String siteKey;
     private String identityProviderUrl;
     private String relyingPartyIdentifier;
     private String incomingTargetUrl;
-    private String idpMetaDataLocation;
-    private String signingCertLocation;
-    private String encryptionCertLocation;
+    private String spMetaDataLocation;
+    private String keyStoreLocation;
+    private String keyStorePass;
+    private String privateKeyPass;
 
     /**
      * @param siteKey
@@ -83,17 +84,21 @@ public class SAML2Settings {
                             incomingTargetUrl = settingsNode
                                     .getProperty(SAML2Constants.SETTINGS_SAML2_INCOMMING_TARGET_URL).getString();
                         }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_IDP_METADATA_LOCATION)) {
-                            idpMetaDataLocation = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_IDP_METADATA_LOCATION).getString();
+                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_SP_META_DATA_LOCATION)) {
+                            spMetaDataLocation = settingsNode
+                                    .getProperty(SAML2Constants.SETTINGS_SAML2_SP_META_DATA_LOCATION).getString();
                         }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_SIGNING_CERT_LOCATION)) {
-                            signingCertLocation = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_SIGNING_CERT_LOCATION).getString();
+                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_LOCATION)) {
+                            keyStoreLocation = settingsNode
+                                    .getProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_LOCATION).getString();
                         }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_ENCRYPTION_CERT_LOCATION)) {
-                            encryptionCertLocation = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_ENCRYPTION_CERT_LOCATION).getString();
+                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS)) {
+                            privateKeyPass = settingsNode
+                                    .getProperty(SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS).getString();
+                        }
+                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS)) {
+                            keyStorePass = settingsNode
+                                    .getProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS).getString();
                         }
                         return true;
                     }
@@ -131,12 +136,14 @@ public class SAML2Settings {
                             getRelyingPartyIdentifier());
                     doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_INCOMMING_TARGET_URL,
                             getIncomingTargetUrl());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_IDP_METADATA_LOCATION,
-                            getIdpMetaDataLocation());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_ENCRYPTION_CERT_LOCATION,
-                            getEncryptionCertLocation());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_SIGNING_CERT_LOCATION,
-                            getSigningCertLocation());
+                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_SP_META_DATA_LOCATION,
+                            getSpMetaDataLocation());
+                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_KEY_STORE_LOCATION,
+                            getKeyStoreLocation());
+                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS,
+                            getKeyStorePass());
+                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS,
+                            getPrivateKeyPass());
 
                     if (doSave) {
                         session.save();
@@ -196,12 +203,36 @@ public class SAML2Settings {
         this.incomingTargetUrl = incomingTargetUrl;
     }
 
-    public String getIdpMetaDataLocation() {
-        return idpMetaDataLocation;
+    public String getSpMetaDataLocation() {
+        return spMetaDataLocation;
     }
 
-    public void setIdpMetaDataLocation(final String idpMetaDataLocation) {
-        this.idpMetaDataLocation = idpMetaDataLocation;
+    public void setSpMetaDataLocation(final String spMetaDataLocation) {
+        this.spMetaDataLocation = spMetaDataLocation;
+    }
+
+    public String getKeyStoreLocation() {
+        return keyStoreLocation;
+    }
+
+    public void setKeyStoreLocation(final String keyStoreLocation) {
+        this.keyStoreLocation = keyStoreLocation;
+    }
+
+    public String getKeyStorePass() {
+        return keyStorePass;
+    }
+
+    public void setKeyStorePass(final String keyStorePass) {
+        this.keyStorePass = keyStorePass;
+    }
+
+    public String getPrivateKeyPass() {
+        return privateKeyPass;
+    }
+
+    public void setPrivateKeyPass(final String privateKeyPass) {
+        this.privateKeyPass = privateKeyPass;
     }
 
     public boolean getEnabled() {
@@ -210,21 +241,5 @@ public class SAML2Settings {
 
     public void setEnabled(final boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public String getSigningCertLocation() {
-        return signingCertLocation;
-    }
-
-    public void setSigningCertLocation(final String signingCertLocation) {
-        this.signingCertLocation = signingCertLocation;
-    }
-
-    public String getEncryptionCertLocation() {
-        return encryptionCertLocation;
-    }
-
-    public void setEncryptionCertLocation(final String encryptionCertLocation) {
-        this.encryptionCertLocation = encryptionCertLocation;
     }
 }

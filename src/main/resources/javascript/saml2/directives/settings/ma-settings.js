@@ -65,16 +65,20 @@ angular.module('jahia.saml2')
                 return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.incomingTargetUrl');
               }
 
-              if(!$scope.settings.idpMetaDataLocation) {
-                return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.idpMetaDataLocation');
+              if(!$scope.settings.spMetaDataLocation) {
+                return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.spMetaDataLocation');
               }
 
-              if(!$scope.settings.signingCertLocation) {
-                return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.signingCertLocation');
+              if(!$scope.settings.keyStoreLocation) {
+                return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.keyStoreLocation');
               }
 
-              if(!$scope.settings.encryptionCertLocation) {
-                return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.encryptionCertLocation');
+              if(!$scope.settings.keyStorePass) {
+                return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.keyStorePass');
+              }
+
+              if(!$scope.settings.privateKeyPass) {
+                return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.privateKeyPass');
               }
 
             }

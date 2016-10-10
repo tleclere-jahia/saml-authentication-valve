@@ -54,7 +54,7 @@
         <groupId>org.jahia.modules</groupId>
         <version>7.1.2.0</version>
     </parent>
-    <groupId>org.jahia.modules</groupId>
+
     <artifactId>saml-authentication-valve</artifactId>
     <name>SAML Authenication Valve</name>
     <version>1.0-SNAPSHOT</version>
@@ -68,6 +68,11 @@
 
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <opensaml.version>3.2.0</opensaml.version>
+        <joda-time.version>2.9.2</joda-time.version>
+        <cryptacular.version>1.1.0</cryptacular.version>
+        <xalan.version>2.7.2</xalan.version>
+        <java-support.version>7.1.1</java-support.version>
     </properties>
 
 
@@ -77,10 +82,137 @@
     </scm>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.pac4j/pac4j-saml -->
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-saml</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-core</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+
         <dependency>
             <groupId>org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
-            <version>2.6.4</version>
+            <artifactId>opensaml-core</artifactId>
+            <version>${opensaml.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.shibboleth.utilities</groupId>
+            <artifactId>java-support</artifactId>
+            <version>${java-support.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-saml-api</artifactId>
+            <version>${opensaml.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-saml-impl</artifactId>
+            <version>${opensaml.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-soap-api</artifactId>
+            <version>${opensaml.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-xmlsec-api</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-security-api</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-security-impl</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-profile-api</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-profile-impl</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-messaging-api</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-messaging-impl</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-xmlsec-impl</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.cryptacular</groupId>
+            <artifactId>cryptacular</artifactId>
+            <version>${cryptacular.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>${xalan.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.6</version>
         </dependency>
 
         <dependency>
@@ -88,6 +220,35 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.2</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk16 -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+            <version>1.45</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/xml-security/xmlsec -->
+        <dependency>
+            <groupId>xml-security</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.9</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.shibboleth.utilities/java-support -->
+        <dependency>
+            <groupId>net.shibboleth.utilities</groupId>
+            <artifactId>java-support</artifactId>
+            <version>7.2.0</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>
@@ -130,6 +291,7 @@
                 <configuration>
                     <instructions>
                         <Jahia-Depends>default</Jahia-Depends>
+                        <Embed-Transitive>false</Embed-Transitive>
                     </instructions>
                 </configuration>
             </plugin>

@@ -97,11 +97,15 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
     }
 
     /**
+     *
      * @param siteKey
      * @param identityProviderUrl
      * @param relyingPartyIdentifier
      * @param incomingTargetUrl
-     * @param idpMetaDataLocation
+     * @param spMetaDataLocation
+     * @param keyStoreLocation
+     * @param keyStorePass
+     * @param privateKeyPass
      * @return
      * @throws IOException
      */
@@ -109,16 +113,18 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
                                           final String identityProviderUrl,
                                           final String relyingPartyIdentifier,
                                           final String incomingTargetUrl,
-                                          final String idpMetaDataLocation,
-                                          final String signingCertLocation,
-                                          final String encryptionCertLocation) throws IOException {
+                                          final String spMetaDataLocation,
+                                          final String keyStoreLocation,
+                                          final String keyStorePass,
+                                          final String privateKeyPass) throws IOException {
         final SAML2Settings settings = new SAML2Settings(siteKey);
         settings.setIdentityProviderUrl(identityProviderUrl);
         settings.setRelyingPartyIdentifier(relyingPartyIdentifier);
         settings.setIncomingTargetUrl(incomingTargetUrl);
-        settings.setIdpMetaDataLocation(idpMetaDataLocation);
-        settings.setSigningCertLocation(signingCertLocation);
-        settings.setEncryptionCertLocation(encryptionCertLocation);
+        settings.setSpMetaDataLocation(spMetaDataLocation);
+        settings.setKeyStoreLocation(keyStoreLocation);
+        settings.setKeyStorePass(keyStorePass);
+        settings.setPrivateKeyPass(privateKeyPass);
 
         // refresh and save settings
         settings.store();

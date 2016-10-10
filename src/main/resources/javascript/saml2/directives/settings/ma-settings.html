@@ -37,16 +37,20 @@
           <input ng-model="settings.incomingTargetUrl">
         </md-input-container>
         <md-input-container class="md-block" flex>
-          <label message-key="saml2nt_settings.saml2_idpMetaDataLocation"></label>
-          <input ng-model="settings.idpMetaDataLocation">
+          <label message-key="saml2nt_settings.saml2_spMetaDataLocation"></label>
+          <input ng-model="settings.spMetaDataLocation">
         </md-input-container>
         <md-input-container class="md-block" flex>
-          <label message-key="saml2nt_settings.saml2_signingCertLocation"></label>
-          <input ng-model="settings.signingCertLocation">
+          <label message-key="saml2nt_settings.saml2_keyStoreLocation"></label>
+          <input ng-model="settings.keyStoreLocation">
         </md-input-container>
         <md-input-container class="md-block" flex>
-          <label message-key="saml2nt_settings.saml2_encryptionCertLocation"></label>
-          <input ng-model="settings.encryptionCertLocation">
+          <label message-key="saml2nt_settings.saml2_keyStorePass"></label>
+          <input ng-model="settings.keyStorePass">
+        </md-input-container>
+        <md-input-container class="md-block" flex>
+          <label message-key="saml2nt_settings.saml2_privateKeyPass"></label>
+          <input ng-model="settings.privateKeyPass">
         </md-input-container>
       </md-card-content>
     </md-card>
