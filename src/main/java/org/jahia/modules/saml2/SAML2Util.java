@@ -63,7 +63,7 @@ public class SAML2Util {
                                              final HttpServletRequest request) {
         final SAML2Settings saml2Settings = saml2SettingsService.getSettings(getCookieValue(request, SAML2Constants.SITE));
         final SAML2ClientConfiguration saml2ClientConfiguration = new SAML2ClientConfiguration();
-        saml2ClientConfiguration.setIdentityProviderMetadataPath(saml2Settings.getIdentityProviderUrl());
+        saml2ClientConfiguration.setIdentityProviderMetadataPath(saml2Settings.getIdentityProviderPath());
         saml2ClientConfiguration.setServiceProviderEntityId(saml2Settings.getRelyingPartyIdentifier());
         saml2ClientConfiguration.setKeystoreResource(CommonHelper.getResource(saml2Settings.getKeyStoreLocation()));
         saml2ClientConfiguration.setKeystorePassword(saml2Settings.getKeyStorePass());

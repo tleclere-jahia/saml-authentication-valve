@@ -99,7 +99,7 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
     /**
      *
      * @param siteKey
-     * @param identityProviderUrl
+     * @param identityProviderPath
      * @param relyingPartyIdentifier
      * @param incomingTargetUrl
      * @param spMetaDataLocation
@@ -110,7 +110,7 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
      * @throws IOException
      */
     public SAML2Settings setSAML2Settings(final String siteKey,
-                                          final String identityProviderUrl,
+                                          final String identityProviderPath,
                                           final String relyingPartyIdentifier,
                                           final String incomingTargetUrl,
                                           final String spMetaDataLocation,
@@ -118,7 +118,7 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
                                           final String keyStorePass,
                                           final String privateKeyPass) throws IOException {
         final SAML2Settings settings = new SAML2Settings(siteKey);
-        settings.setIdentityProviderUrl(identityProviderUrl);
+        settings.setIdentityProviderPath(identityProviderPath);
         settings.setRelyingPartyIdentifier(relyingPartyIdentifier);
         settings.setIncomingTargetUrl(incomingTargetUrl);
         settings.setSpMetaDataLocation(spMetaDataLocation);

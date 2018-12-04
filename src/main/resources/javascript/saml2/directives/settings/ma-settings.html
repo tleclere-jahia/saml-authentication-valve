@@ -25,8 +25,12 @@
           <span message-key="saml2nt_settings.saml2_enabled"></span>
         </md-checkbox>
         <md-input-container class="md-block" flex>
-          <label message-key="saml2nt_settings.saml2_identityProviderUrl"></label>
-          <input ng-model="settings.identityProviderUrl">
+          <label message-key="saml2nt_settings.saml2_identityProviderPath"></label>
+          <input ng-model="settings.identityProviderPath">
+        </md-input-container>
+        <md-input-container class="md-block" flex>
+          <label message-key="saml2nt_settings.saml2_spMetaDataLocation"></label>
+          <input ng-model="settings.spMetaDataLocation">
         </md-input-container>
         <md-input-container class="md-block" flex>
           <label message-key="saml2nt_settings.saml2_relyingPartyIdentifier"></label>
@@ -36,10 +40,7 @@
           <label message-key="saml2nt_settings.saml2_incomingTargetUrl"></label>
           <input ng-model="settings.incomingTargetUrl">
         </md-input-container>
-        <md-input-container class="md-block" flex>
-          <label message-key="saml2nt_settings.saml2_spMetaDataLocation"></label>
-          <input ng-model="settings.spMetaDataLocation">
-        </md-input-container>
+
         <md-input-container class="md-block" flex>
           <label message-key="saml2nt_settings.saml2_keyStoreLocation"></label>
           <input ng-model="settings.keyStoreLocation">

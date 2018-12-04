@@ -8,7 +8,7 @@
 [jnt:samlLogin] > jnt:content, jmix:basicContent
 
 [saml2nt:settings] > nt:base, jmix:unversionedBasemetadata
- - saml2:identityProviderUrl (string) nofulltext
+ - saml2:identityProviderPath (string) nofulltext
  - saml2:relyingPartyIdentifier (string) nofulltext
  - saml2:incomingTargetUrl (string) nofulltext
  - saml2:spMetaDataLocation (string) nofulltext

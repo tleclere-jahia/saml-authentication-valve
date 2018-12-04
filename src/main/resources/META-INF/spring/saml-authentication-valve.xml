@@ -49,4 +49,25 @@
         <property name="requiredPermission" value="canSetupSaml2"/>
         <property name="saml2SettingsService" ref="saml2SettingsService"/>
     </bean>
+
+
+    <bean id="saml2Constants" class="org.jahia.modules.saml2.SAML2Constants"/>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="org.jahia.modules.saml2.SAML2Constants.setServerName" />
+        <property name="arguments">
+            <list>
+                <value>${saml.auth.servername:localhost}</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="org.jahia.modules.saml2.SAML2Constants.setSiteKey" />
+        <property name="arguments">
+            <list>
+                <value>${saml.auth.sitekey:digitall}</value>
+            </list>
+        </property>
+    </bean>
 </beans>

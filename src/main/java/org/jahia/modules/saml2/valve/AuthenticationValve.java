@@ -45,13 +45,21 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
         final AuthValveContext authContext = (AuthValveContext) context;
         final HttpServletRequest request = authContext.getRequest();
         final HttpServletResponse response = authContext.getResponse();
+
+
         final boolean isSAMLLoginProcess = CMS_PREFIX.equals(request.getServletPath())
                 && (Login.getMapping()).equals(request.getPathInfo())
                 && StringUtils.isNotEmpty(request.getParameter("authenticationService"));
 
-        //TODO: fix the incoming path
         final boolean isSAMLIncomingLoginProcess = CMS_PREFIX.equals(request.getServletPath())
                 && (Login.getMapping() + ".SAML.incoming").equals(request.getPathInfo());
+
+        // check on the domain to make sure the valve is enabled only on the right site and check on site key as it a mandatory value
+        final boolean enabled = SAML2Constants.serverName.equals(request.getServerName());
+        if (!enabled) {
+            valveContext.invokeNext(context);
+            return;
+        }
 
         // This is the starting process of the SAML authentication which redirects the user to the IDP login screen
         if (isSAMLLoginProcess) {
@@ -59,7 +67,7 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 // Storing redirect url into cookie to be used when the request is send from IDP to continue the
                 // access to the secure resource
                 response.addCookie(new Cookie(REDIRECT, request.getParameter(REDIRECT)));
-                response.addCookie(new Cookie(SAML2Constants.SITE, request.getParameter(SAML2Constants.SITE)));
+                response.addCookie(new Cookie(SAML2Constants.siteKey, request.getParameter(SAML2Constants.SITE)));
 
                 final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request);
                 final J2EContext webContext = new J2EContext(request, response);

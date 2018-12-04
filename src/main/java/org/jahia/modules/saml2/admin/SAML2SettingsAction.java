@@ -75,8 +75,8 @@ public class SAML2SettingsAction extends Action {
                 final SAML2Settings oldSettings = saml2SettingsService.getSettings(siteKey);
                 final Boolean enabled = getSettingOrDefault(settings, SAML2Constants.ENABLED,
                         (oldSettings != null && oldSettings.getEnabled()));
-                final String identityProviderUrl = getSettingOrDefault(settings, SAML2Constants.IDENTITY_PROVIDER_URL,
-                        (oldSettings != null ? oldSettings.getIdentityProviderUrl() : ""));
+                final String identityProviderPath = getSettingOrDefault(settings, SAML2Constants.IDENTITY_PROVIDER_URL,
+                        (oldSettings != null ? oldSettings.getIdentityProviderPath() : ""));
                 final String relyingPartyIdentifier = getSettingOrDefault(settings, SAML2Constants.RELYING_PARTY_IDENTIFIER,
                         (oldSettings != null ? oldSettings.getRelyingPartyIdentifier() : ""));
                 final String incomingTargetUrl = getSettingOrDefault(settings, SAML2Constants.INCOMING_TARGET_URL,
@@ -91,7 +91,7 @@ public class SAML2SettingsAction extends Action {
                         (oldSettings != null ? oldSettings.getPrivateKeyPass() : ""));
                 if (enabled) {
                     serverSettings = saml2SettingsService.setSAML2Settings(siteKey,
-                            identityProviderUrl, relyingPartyIdentifier, incomingTargetUrl,
+                            identityProviderPath, relyingPartyIdentifier, incomingTargetUrl,
                             spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass);
                 } else {
                     serverSettings = null;
@@ -103,7 +103,7 @@ public class SAML2SettingsAction extends Action {
             final JSONObject resp = new JSONObject();
             if (serverSettings != null) {
                 resp.put(SAML2Constants.ENABLED, serverSettings.getEnabled());
-                resp.put(SAML2Constants.IDENTITY_PROVIDER_URL, serverSettings.getIdentityProviderUrl());
+                resp.put(SAML2Constants.IDENTITY_PROVIDER_URL, serverSettings.getIdentityProviderPath());
                 resp.put(SAML2Constants.RELYING_PARTY_IDENTIFIER, serverSettings.getRelyingPartyIdentifier());
                 resp.put(SAML2Constants.INCOMING_TARGET_URL, serverSettings.getIncomingTargetUrl());
                 resp.put(SAML2Constants.SP_META_DATA_LOCATION, serverSettings.getSpMetaDataLocation());

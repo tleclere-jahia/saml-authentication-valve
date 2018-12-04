@@ -21,7 +21,7 @@ public class SAML2Settings {
 
     private boolean enabled;
     private String siteKey;
-    private String identityProviderUrl;
+    private String identityProviderPath;
     private String relyingPartyIdentifier;
     private String incomingTargetUrl;
     private String spMetaDataLocation;
@@ -73,7 +73,7 @@ public class SAML2Settings {
                                 .getNode("/sites/" + siteKey + "/" + SAML2Constants.SETTINGS_NODE_NAME);
 
                         if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_IDENTITY_PROVIDER_URL)) {
-                            identityProviderUrl = settingsNode
+                            identityProviderPath = settingsNode
                                     .getProperty(SAML2Constants.SETTINGS_SAML2_IDENTITY_PROVIDER_URL).getString();
                         }
                         if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_RELYING_PARTY_IDENTIFIER)) {
@@ -131,7 +131,7 @@ public class SAML2Settings {
                     }
 
                     boolean doSave = setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_IDENTITY_PROVIDER_URL,
-                            getIdentityProviderUrl());
+                            getIdentityProviderPath());
                     doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_RELYING_PARTY_IDENTIFIER,
                             getRelyingPartyIdentifier());
                     doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_INCOMMING_TARGET_URL,
@@ -179,12 +179,12 @@ public class SAML2Settings {
         return false;
     }
 
-    public String getIdentityProviderUrl() {
-        return identityProviderUrl;
+    public String getIdentityProviderPath() {
+        return identityProviderPath;
     }
 
-    public void setIdentityProviderUrl(final String identityProviderUrl) {
-        this.identityProviderUrl = identityProviderUrl;
+    public void setIdentityProviderPath(final String identityProviderPath) {
+        this.identityProviderPath = identityProviderPath;
     }
 
     public String getRelyingPartyIdentifier() {

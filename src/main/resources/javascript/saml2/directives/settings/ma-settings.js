@@ -53,8 +53,8 @@ angular.module('jahia.saml2')
           $scope.validate = function () {
 
             if($scope.settings.enabled) {
-              if(!$scope.settings.identityProviderUrl) {
-                  return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.identityProviderUrl');
+              if(!$scope.settings.identityProviderPath) {
+                  return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.identityProviderPath');
               }
 
               if(!$scope.settings.relyingPartyIdentifier) {
