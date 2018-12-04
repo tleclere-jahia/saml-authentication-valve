@@ -1,7 +1,7 @@
 # SAML Authentication Valve #
 This POC authentication valve is set up to connect to a Shibboleth IDP.  This authentication valve is not supported by Jahia.  Use at your own risk.
 
-##I / Self Signed Certifcates generation for the Service Provider (Jahia)
+## I / Self Signed Certifcates generation for the Service Provider (Jahia)
 Create the certificates, keys, and keystore in the `${java.home}/jre/lib/security/`.  This should only used for **non production** environments.
 
 - **keypass**: Password to protect the private key
@@ -57,7 +57,7 @@ The newly created certificate should be listed when running this command
 keytool -list -keystore cacerts
 ```
 
-##II / Valve Configuration
+## II / Valve Configuration
 
 ###local path of the Identity Provider MetaData file
 The IPD Metadata file is provided by the IDP. This XML file must be uploaded on the Jahia server and its path must be provided in this field
