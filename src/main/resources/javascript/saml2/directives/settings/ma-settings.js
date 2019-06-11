@@ -80,6 +80,9 @@ angular.module('jahia.saml2')
               if(!$scope.settings.privateKeyPass) {
                 return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.privateKeyPass');
               }
+              if(!$scope.settings.loginSuccessPath) {
+                return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.loginSuccessPath');
+              }
 
             }
 

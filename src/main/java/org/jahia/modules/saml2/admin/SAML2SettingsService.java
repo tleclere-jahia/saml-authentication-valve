@@ -116,7 +116,8 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
                                           final String spMetaDataLocation,
                                           final String keyStoreLocation,
                                           final String keyStorePass,
-                                          final String privateKeyPass) throws IOException {
+                                          final String privateKeyPass,
+                                          final String postLoginPath) throws IOException {
         final SAML2Settings settings = new SAML2Settings(siteKey);
         settings.setIdentityProviderPath(identityProviderPath);
         settings.setRelyingPartyIdentifier(relyingPartyIdentifier);
@@ -125,6 +126,7 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         settings.setKeyStoreLocation(keyStoreLocation);
         settings.setKeyStorePass(keyStorePass);
         settings.setPrivateKeyPass(privateKeyPass);
+        settings.setPostLoginPath(postLoginPath);
 
         // refresh and save settings
         settings.store();

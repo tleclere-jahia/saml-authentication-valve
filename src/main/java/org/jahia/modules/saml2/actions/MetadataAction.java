@@ -20,9 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by smomin on 5/27/16.
- */
 public class MetadataAction extends Action {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetadataAction.class);
     private SAML2SettingsService saml2SettingsService;

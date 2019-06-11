@@ -12,9 +12,6 @@ import javax.jcr.observation.EventIterator;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by smomin on 8/19/16.
- */
 public class SAML2SettingsChangedListener implements ApplicationListener<ApplicationEvent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsChangedListener.class);
     private SAML2SettingsService saml2SettingsService;

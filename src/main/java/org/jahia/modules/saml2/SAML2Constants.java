@@ -1,8 +1,5 @@
 package org.jahia.modules.saml2;
 
-/**
- * Created by smomin on 6/1/16.
- */
 public class SAML2Constants {
     public static final String ENABLED = "enabled";
     public static final String IDENTITY_PROVIDER_URL = "identityProviderPath";
@@ -24,6 +21,11 @@ public class SAML2Constants {
     public static final String SETTINGS_SAML2_KEY_STORE_LOCATION = "saml2:keyStoreLocation";
     public static final String SETTINGS_SAML2_KEY_STORE_PASS = "saml2:keyStorePass";
     public static final String SETTINGS_SAML2_PRIVATE_KEY_PASS = "saml2:privateKeyPass";
+    public static final String SETTINGS_SAML2_POST_LOGIN_PATH = "loginSuccessPath";
+
+    public static final String SAML2_USER_PROPERTY_EMAIL = "Email";
+    public static final String SAML2_USER_PROPERTY_FIRSTNAME = "First Name";
+    public static final String SAML2_USER_PROPERTY_LASTNAME = "Last Name";
 
     public static String serverName;
     public static String siteKey;

@@ -1,6 +1,7 @@
 package org.jahia.modules.saml2.valve;
 
 import org.apache.commons.lang.StringUtils;
+import org.jahia.api.Constants;
 import org.jahia.bin.Login;
 import org.jahia.modules.saml2.SAML2Constants;
 import org.jahia.modules.saml2.SAML2Util;
@@ -10,9 +11,12 @@ import org.jahia.params.valves.AutoRegisteredBaseAuthValve;
 import org.jahia.params.valves.LoginEngineAuthValveImpl;
 import org.jahia.pipelines.PipelineException;
 import org.jahia.pipelines.valves.ValveContext;
-import org.jahia.registries.ServicesRegistry;
+import org.jahia.services.content.JCRNodeWrapper;
+import org.jahia.services.content.JCRSessionFactory;
+import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRUserNode;
 import org.jahia.services.usermanager.JahiaUser;
+import org.jahia.services.usermanager.JahiaUserManagerService;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.saml.client.SAML2Client;
@@ -21,18 +25,27 @@ import org.pac4j.saml.profile.SAML2Profile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.RepositoryException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Properties;
 
-/**
- * Created by smomin on 5/27/16.
- */
+import static org.jahia.modules.saml2.SAML2Constants.*;
+import static org.jahia.modules.saml2.utils.JCRConstants.*;
+
 public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationValve.class);
     private static final String CMS_PREFIX = "/cms";
     private static final String REDIRECT = "redirect";
+    private static final String defaultLocale = "en_US";
     private SAML2SettingsService saml2SettingsService;
+    private JCRSessionWrapper sessionWrapper;
+    private JahiaUserManagerService jahiaUserManagerService;
+
 
     /**
      * @param context
@@ -48,14 +61,14 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
 
 
         final boolean isSAMLLoginProcess = CMS_PREFIX.equals(request.getServletPath())
-                && (Login.getMapping()).equals(request.getPathInfo())
-                && StringUtils.isNotEmpty(request.getParameter("authenticationService"));
+                && (Login.getMapping()).equals(request.getPathInfo());
 
         final boolean isSAMLIncomingLoginProcess = CMS_PREFIX.equals(request.getServletPath())
                 && (Login.getMapping() + ".SAML.incoming").equals(request.getPathInfo());
 
         // check on the domain to make sure the valve is enabled only on the right site and check on site key as it a mandatory value
-        final boolean enabled = SAML2Constants.serverName.equals(request.getServerName());
+        final boolean enabled = serverName.equals(request.getServerName());
+
         if (!enabled) {
             valveContext.invokeNext(context);
             return;
@@ -67,7 +80,7 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 // Storing redirect url into cookie to be used when the request is send from IDP to continue the
                 // access to the secure resource
                 response.addCookie(new Cookie(REDIRECT, request.getParameter(REDIRECT)));
-                response.addCookie(new Cookie(SAML2Constants.siteKey, request.getParameter(SAML2Constants.SITE)));
+                response.addCookie(new Cookie(siteKey, request.getParameter(SITE)));
 
                 final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request);
                 final J2EContext webContext = new J2EContext(request, response);
@@ -81,26 +94,139 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 final J2EContext webContext = new J2EContext(request, response);
                 final SAML2Credentials saml2Credentials = client.getCredentials(webContext);
                 final SAML2Profile saml2Profile = client.getUserProfile(saml2Credentials, webContext);
-                final String uid = saml2Profile.getUsername();
-                LOGGER.debug("uid " + uid);
-                if (StringUtils.isNotEmpty(uid)) {
-                    final JCRUserNode jahiaUserNode = ServicesRegistry.getInstance().getJahiaUserManagerService()
-                            .lookupUser(uid, SAML2Util.getCookieValue(request, SAML2Constants.SITE));
-                    if (jahiaUserNode != null) {
-                        final JahiaUser jahiaUser = jahiaUserNode.getJahiaUser();
-                        if (jahiaUser.isAccountLocked()) {
-                            LOGGER.info("Login failed. Account is locked for user " + uid);
-                            return;
-                        }
-                        authContext.getSessionFactory().setCurrentUser(jahiaUser);
+                final String email = saml2Profile.getEmail();
+                LOGGER.debug("email of SAML Profile: " + email);
+
+
+                JCRUserNode jahiaUserNode = null;
+
+                if (StringUtils.isNotEmpty(email)) {
+                    jahiaUserNode = this.processSSOUserInJcr(email, saml2Profile, request);
+                    final JahiaUser jahiaUser = jahiaUserNode.getJahiaUser();
+                    if (jahiaUser.isAccountLocked()) {
+                        LOGGER.info("Login failed. Account is locked for user " + email);
                     }
+                    authContext.getSessionFactory().setCurrentUser(jahiaUser);
+                    request.getSession().setAttribute(Constants.SESSION_USER, jahiaUser);
                 }
 
                 request.setAttribute(LoginEngineAuthValveImpl.VALVE_RESULT, LoginEngineAuthValveImpl.OK);
-                response.sendRedirect(SAML2Util.getCookieValue(request, REDIRECT));
+
+                // Get the redirection URL from the cookie, if not set takes the value is taken from the site settings
+                String redirection = retrieveRedirectUrl(request);
+                response.sendRedirect(redirection);
             });
         }
         valveContext.invokeNext(context);
+    }
+
+    /**
+     * Update user is exist or create a new user for site with sso profile properties.
+     *
+     * @param email
+     * @param saml2Profile
+     * @param request
+     * @return
+     * @throws RepositoryException
+     */
+    private JCRUserNode processSSOUserInJcr(String email, SAML2Profile saml2Profile, HttpServletRequest request) throws RepositoryException {
+        this.sessionWrapper = JCRSessionFactory.getInstance()
+                .getCurrentSystemSession(
+                        null,
+                        (request.getLocale() != null) ? request.getLocale() : new Locale(defaultLocale),
+                        new Locale(defaultLocale));
+        JCRUserNode ssoUserNode = null;
+        if (this.jahiaUserManagerService.userExists(email, SAML2Constants.siteKey)) {
+            ssoUserNode = this.jahiaUserManagerService.lookupUser(email, SAML2Constants.siteKey, this.sessionWrapper);
+            JCRNodeWrapper jcrNodeWrapper = ssoUserNode.getDecoratedNode();
+            boolean isUpdated =  this.updateProperties(jcrNodeWrapper, saml2Profile);
+            //saving session if any property is updated for user.
+            if (isUpdated) {
+                this.sessionWrapper.save();
+            }
+        } else {
+            ssoUserNode = jahiaUserManagerService.createUser(email, SAML2Constants.siteKey,
+                    "SAH-1*", this.initialProperties(saml2Profile), this.sessionWrapper);
+            this.sessionWrapper.save();
+        }
+        return ssoUserNode;
+    }
+
+    /**
+     * properties for new user.
+     */
+    private Properties initialProperties(SAML2Profile saml2Profile) {
+        Properties properties = new Properties();
+        properties.setProperty(USER_PROPERTY_EMAIL, this.getProfileAttribute(SAML2_USER_PROPERTY_EMAIL, saml2Profile));
+        properties.setProperty(USER_PROPERTY_LASTNAME, this.getProfileAttribute(SAML2_USER_PROPERTY_LASTNAME, saml2Profile));
+        properties.setProperty(USER_PROPERTY_FIRSTNAME, this.getProfileAttribute(SAML2_USER_PROPERTY_FIRSTNAME, saml2Profile));
+        return properties;
+    }
+
+    /**
+     * Update properties for existing user node.
+     *
+     * @param jcrNodeWrapper
+     * @param saml2Profile
+     * @throws RepositoryException
+     */
+    private boolean updateProperties(JCRNodeWrapper jcrNodeWrapper, SAML2Profile saml2Profile) throws RepositoryException {
+        boolean isUpdated = false;
+        String email = this.getProfileAttribute(SAML2_USER_PROPERTY_EMAIL, saml2Profile);
+        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_EMAIL)) ||
+                !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_EMAIL).equals(email)) {
+            jcrNodeWrapper.setProperty(USER_PROPERTY_EMAIL, email);
+            isUpdated = true;
+        }
+
+        String lastname = this.getProfileAttribute(SAML2_USER_PROPERTY_LASTNAME, saml2Profile);
+        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_LASTNAME)) ||
+                !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_LASTNAME).equals(lastname)) {
+            jcrNodeWrapper.setProperty(USER_PROPERTY_LASTNAME, lastname);
+            isUpdated = true;
+        }
+
+        String firstname = this.getProfileAttribute(SAML2_USER_PROPERTY_FIRSTNAME, saml2Profile);
+        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_FIRSTNAME)) ||
+                !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_FIRSTNAME).equals(firstname)) {
+            jcrNodeWrapper.setProperty(USER_PROPERTY_FIRSTNAME, firstname);
+            isUpdated = true;
+        }
+
+        return isUpdated;
+    }
+
+    /**
+     * Fetch user profile attributes from SAML profile.
+     *
+     * @param name
+     * @param saml2Profile
+     * @return
+     */
+    private String getProfileAttribute(String name, SAML2Profile saml2Profile) {
+        ArrayList<String> strings = saml2Profile.getAttribute(name, ArrayList.class);
+        if (Objects.nonNull(strings)) {
+            return strings.get(0);
+        }
+        return "";
+    }
+
+    /**
+     * Gets the redirection URL from the cookie, if not set takes the value is taken from the site settings
+     * @param request : the http request
+     * @return the redirection URL
+     */
+    private String retrieveRedirectUrl(HttpServletRequest request) {
+        String redirection = SAML2Util.getCookieValue(request, REDIRECT);
+        if(StringUtils.isEmpty(redirection)) {
+            redirection = this.saml2SettingsService.getSettings(SAML2Constants.siteKey).getPostLoginPath();
+            if(StringUtils.isEmpty(redirection)) {
+                // default value
+                redirection = "/";
+            }
+        }
+
+        return redirection;
     }
 
     /**
@@ -109,4 +235,9 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
     public void setSaml2SettingsService(final SAML2SettingsService saml2SettingsService) {
         this.saml2SettingsService = saml2SettingsService;
     }
+
+    public void setJahiaUserManagerService(JahiaUserManagerService jahiaUserManagerService) {
+        this.jahiaUserManagerService = jahiaUserManagerService;
+    }
 }
+

@@ -89,10 +89,12 @@ public class SAML2SettingsAction extends Action {
                         (oldSettings != null ? oldSettings.getKeyStorePass() : ""));
                 final String privateKeyPass = getSettingOrDefault(settings, SAML2Constants.PRIVATE_KEY_PASS,
                         (oldSettings != null ? oldSettings.getPrivateKeyPass() : ""));
+                final String postLoginPath = getSettingOrDefault(settings, SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH,
+                        (oldSettings != null ? oldSettings.getPostLoginPath() : ""));
                 if (enabled) {
                     serverSettings = saml2SettingsService.setSAML2Settings(siteKey,
                             identityProviderPath, relyingPartyIdentifier, incomingTargetUrl,
-                            spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass);
+                            spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass,postLoginPath);
                 } else {
                     serverSettings = null;
                 }
@@ -110,6 +112,7 @@ public class SAML2SettingsAction extends Action {
                 resp.put(SAML2Constants.KEY_STORE_LOCATION, serverSettings.getKeyStoreLocation());
                 resp.put(SAML2Constants.KEY_STORE_PASS, serverSettings.getKeyStorePass());
                 resp.put(SAML2Constants.PRIVATE_KEY_PASS, serverSettings.getPrivateKeyPass());
+                resp.put(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH, serverSettings.getPostLoginPath());
             }
             resp.put("noConf", serverSettings == null);
             return new ActionResult(HttpServletResponse.SC_OK, null, resp);

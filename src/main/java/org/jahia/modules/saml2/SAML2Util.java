@@ -13,11 +13,9 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * Created by smomin on 5/27/16.
- */
 public class SAML2Util {
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Util.class);
+    private static SAML2Client CLIENT;
 
     /**
      * @param request
@@ -30,9 +28,9 @@ public class SAML2Util {
         if (StringUtils.isEmpty(serverName)) {
             serverName = request.getServerName();
         }
-        url.append("https://").append(serverName);
+        url.append("http://").append(serverName);
 
-        return "https://" + serverName + incoming;
+        return "http://" + serverName + incoming;
     }
 
     /**
@@ -55,25 +53,40 @@ public class SAML2Util {
     }
 
     /**
+     * Get saml client.
+     *
      * @param saml2SettingsService
      * @param request
      * @return
      */
     public static SAML2Client getSAML2Client(final SAML2SettingsService saml2SettingsService,
                                              final HttpServletRequest request) {
-        final SAML2Settings saml2Settings = saml2SettingsService.getSettings(getCookieValue(request, SAML2Constants.SITE));
+        final SAML2Settings saml2Settings = saml2SettingsService.getSettings(SAML2Constants.siteKey);
+        if (CLIENT == null) {
+            initSAMLClient(saml2Settings, request);
+        }
+        return CLIENT;
+    }
+
+    /**
+     * New method to Initializing saml client.
+     *
+     * @param saml2Settings
+     * @param request
+     */
+    private static void initSAMLClient(SAML2Settings saml2Settings, HttpServletRequest request) {
         final SAML2ClientConfiguration saml2ClientConfiguration = new SAML2ClientConfiguration();
         saml2ClientConfiguration.setIdentityProviderMetadataPath(saml2Settings.getIdentityProviderPath());
         saml2ClientConfiguration.setServiceProviderEntityId(saml2Settings.getRelyingPartyIdentifier());
-        saml2ClientConfiguration.setKeystoreResource(CommonHelper.getResource(saml2Settings.getKeyStoreLocation()));
+        saml2ClientConfiguration.setKeystorePath(saml2Settings.getKeyStoreLocation());
         saml2ClientConfiguration.setKeystorePassword(saml2Settings.getKeyStorePass());
         saml2ClientConfiguration.setPrivateKeyPassword(saml2Settings.getPrivateKeyPass());
         saml2ClientConfiguration.setServiceProviderMetadataPath(saml2Settings.getSpMetaDataLocation());
 
-        final SAML2Client client = new SAML2Client(saml2ClientConfiguration);
-        client.setCallbackUrl(SAML2Util.getAssertionConsumerServiceUrl(request, saml2Settings.getIncomingTargetUrl()));
-        return client;
+        CLIENT = new SAML2Client(saml2ClientConfiguration);
+        CLIENT.setCallbackUrl(SAML2Util.getAssertionConsumerServiceUrl(request, saml2Settings.getIncomingTargetUrl()));
     }
+
 
 
     /**
@@ -90,4 +103,11 @@ public class SAML2Util {
         return null;
     }
 
+    /**
+     * Method to reset SAMLClient so that a new state {@link SAML2Client} can be
+     * generated, when it is requested the next time.
+     */
+    public static void resetClient() {
+        CLIENT = null;
+    }
 }

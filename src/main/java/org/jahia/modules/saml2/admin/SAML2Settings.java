@@ -13,9 +13,6 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.RepositoryException;
 import java.io.IOException;
 
-/**
- * Created by smomin on 8/18/16.
- */
 public class SAML2Settings {
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Settings.class);
 
@@ -28,6 +25,8 @@ public class SAML2Settings {
     private String keyStoreLocation;
     private String keyStorePass;
     private String privateKeyPass;
+    private String postLoginPath;
+
 
     /**
      * @param siteKey
@@ -100,6 +99,10 @@ public class SAML2Settings {
                             keyStorePass = settingsNode
                                     .getProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS).getString();
                         }
+                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH)) {
+                            postLoginPath = settingsNode
+                                    .getProperty(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH).getString();
+                        }
                         return true;
                     }
                     return false;
@@ -144,6 +147,8 @@ public class SAML2Settings {
                             getKeyStorePass());
                     doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS,
                             getPrivateKeyPass());
+                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH,
+                            getPostLoginPath());
 
                     if (doSave) {
                         session.save();
@@ -242,4 +247,13 @@ public class SAML2Settings {
     public void setEnabled(final boolean enabled) {
         this.enabled = enabled;
     }
+
+    public String getPostLoginPath() {
+        return postLoginPath;
+    }
+
+    public void setPostLoginPath(String postLoginPath) {
+        this.postLoginPath = postLoginPath;
+    }
+
 }

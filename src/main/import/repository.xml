@@ -32,7 +32,7 @@
                         <saml2-settings j:applyOn="jnt:virtualsite"
                                j:defaultTemplate="false"
                                j:hiddenTemplate="false"
-                               j:icon="/modules/saml-authentication-valve/templates/files/16_security_key.png"
+                               j:icon="#/modules/saml-authentication-valve/templates/files/16_security_key.png"
                                j:requiredPermissionNames="canSetupSaml2"
                                j:view="saml2"
                                jcr:primaryType="jnt:contentTemplate">

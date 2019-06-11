@@ -15,6 +15,7 @@
  - saml2:keyStoreLocation (string) nofulltext
  - saml2:keyStorePass (string) nofulltext
  - saml2:privateKeyPass (string) nofulltext
+ - loginSuccessPath (string) nofulltext
 
 [saml2nt:manageSettings] > jnt:content, jmix:siteComponent, mix:title, jmix:studioOnly
 
