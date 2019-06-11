@@ -9,39 +9,39 @@ Create the certificates, keys, and keystore in the `${java.home}/jre/lib/securit
 
 **Note** `keytool` is available as part of the Java package. 
 
-#### 1. Key Store Generation
+### 1. Key Store Generation
 
 Create a keystore that will contain the certificate and key to be used when signing and encrypting the SAML2 authentication request.  The private key will be used to decrypt the SAML2 assertion response.
 ```sh
 keytool -genkeypair -alias jahiakeystorealias -keypass ${jahiakeypass} -keystore sp.jks -storepass ${keystorepassword} -keyalg RSA -keysize 2048 -validity 3650
 ```
 
-######Important Input Step
+#####Important Input Step
 - What is your first and last name?: `jahia.server.name`
 
 **This value must match your Jahia site domain name**
 
-#### 2. Private Key Generation
+### 2. Private Key Generation
 Create a private key to be used for SSL protocol transmission to Jahia DX.
 
 ```
 openssl req -new -newkey rsa:2048 -nodes -keyout jahia.key -out jahia.csr
 ```
-######Important Input Step
+#####Important Input Step
 
 - Common Name (eg, your name or your server's hostname): `jahia.sp.id`
 
 **This value is arbitrary and will be our “Relying Party Identifier”**
 
 
-#### 3. Certificate Generation
+### 3. Certificate Generation
 Create a certificate to be used for SSL protocol transmission to Jahia DX.
 
 ```
 openssl x509 -req -days 365 -in jahia.csr -signkey jahia.key -out jahia.crt
 ```
 
-#### 4. Adding the certification to the keystore
+### 4. Adding the certification to the keystore
 
 The keystore password should be the same as defined in the key store generation
 
@@ -49,7 +49,7 @@ The keystore password should be the same as defined in the key store generation
 keytool -keystore cacerts -importcert -alias jahiakeystorealias -file jahia.crt
 ```
 
-#### 5. Verification by listing certificates in Java Key Store
+### 5. Verification by listing certificates in Java Key Store
 
 The newly created certificate should be listed when running this command
 
@@ -77,7 +77,7 @@ Those value must match the one defined when creating the server key and certific
 #### Redirect after successful login
 This is the DX relative ULR where the user will be redirect after successfully authentication.
 
-#### Configuration example
+## Configuration example
 
 - Local path of the Identity Provider MetaData file:`/Users/john/jahia/sso-config/idp.metadata.xml`
 - Local path of the generated Service Provider MetaData file:
@@ -87,3 +87,9 @@ This is the DX relative ULR where the user will be redirect after successfully a
 - Key Store Pass:`keystorepassword`
 - Private Key Pass:`jahiakeypass`
 - Redirect ath sfter successful login:`/home/about.html`
+
+## Setting Up Testing Environment
+
+Here is a link to a Docker Test SAML Identity Provider to test against this valve
+
+https://github.com/Jahia/docker-test-saml-idp
