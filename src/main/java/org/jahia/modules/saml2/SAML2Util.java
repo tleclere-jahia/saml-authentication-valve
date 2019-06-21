@@ -17,6 +17,25 @@ public class SAML2Util {
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Util.class);
     private static SAML2Client CLIENT;
 
+
+    /**
+     * SAML Initialization on class level.
+     */
+    static {
+        // adapt TCCL
+        final Thread thread = Thread.currentThread();
+        final ClassLoader loader = thread.getContextClassLoader();
+        thread.setContextClassLoader(InitializationService.class.getClassLoader());
+        try {
+            InitializationService.initialize();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        } finally {
+            // reset TCCL
+            thread.setContextClassLoader(loader);
+        }
+    }
+
     /**
      * @param request
      * @return
@@ -42,7 +61,6 @@ public class SAML2Util {
         final ClassLoader loader = thread.getContextClassLoader();
         thread.setContextClassLoader(InitializationService.class.getClassLoader());
         try {
-            InitializationService.initialize();
             callBack.execute();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
