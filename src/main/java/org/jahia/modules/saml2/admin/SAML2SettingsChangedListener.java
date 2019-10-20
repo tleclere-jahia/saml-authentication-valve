@@ -1,6 +1,7 @@
 package org.jahia.modules.saml2.admin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.jcr.RepositoryException;
 import javax.jcr.observation.Event;
@@ -75,7 +76,7 @@ public class SAML2SettingsChangedListener implements ApplicationListener<Applica
          * @return
          */
         public List<String> getAffectedSites() {
-            return affectedSites;
+            return Collections.unmodifiableList(affectedSites);
         }
     }
 }

@@ -12,10 +12,9 @@ import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.bin.Login;
 import org.jahia.modules.saml2.SAML2Constants;
-import static org.jahia.modules.saml2.SAML2Constants.*;
 import org.jahia.modules.saml2.SAML2Util;
 import org.jahia.modules.saml2.admin.SAML2SettingsService;
-import static org.jahia.modules.saml2.utils.JCRConstants.*;
+import org.jahia.modules.saml2.utils.JCRConstants;
 import org.jahia.params.valves.AuthValveContext;
 import org.jahia.params.valves.AutoRegisteredBaseAuthValve;
 import org.jahia.params.valves.LoginEngineAuthValveImpl;
@@ -64,7 +63,8 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 && (Login.getMapping() + ".SAML.incoming").equals(request.getPathInfo());
 
         // check on the domain to make sure the valve is enabled only on the right site and check on site key as it a mandatory value
-        final boolean enabled = serverName.equals(request.getServerName());
+        // TODO: check if the module is activated for the current website
+        final boolean enabled = true;
 
         if (!enabled) {
             valveContext.invokeNext(context);
@@ -73,11 +73,13 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
 
         // This is the starting process of the SAML authentication which redirects the user to the IDP login screen
         if (isSAMLLoginProcess) {
+            // TODO: retrieve siteKey from the request
+            final String siteKey = "";
             SAML2Util.initialize(() -> {
                 // Storing redirect url into cookie to be used when the request is send from IDP to continue the
                 // access to the secure resource
-                response.addCookie(new Cookie(REDIRECT, request.getParameter(REDIRECT)));
-                response.addCookie(new Cookie(siteKey, request.getParameter(SITE)));
+                response.addCookie(new Cookie(REDIRECT, request.getParameter(REDIRECT).replaceAll("\n\r", "")));
+                response.addCookie(new Cookie(siteKey, request.getParameter(SAML2Constants.SITE).replaceAll("\n\r", "")));
 
                 final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request);
                 final J2EContext webContext = new J2EContext(request, response);
@@ -132,8 +134,10 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                         (request.getLocale() != null) ? request.getLocale() : new Locale(defaultLocale),
                         new Locale(defaultLocale));
         JCRUserNode ssoUserNode = null;
-        if (this.jahiaUserManagerService.userExists(email, SAML2Constants.siteKey)) {
-            ssoUserNode = this.jahiaUserManagerService.lookupUser(email, SAML2Constants.siteKey, this.sessionWrapper);
+        // TODO: retrieve siteKey from the request
+        final String siteKey = "";
+        if (this.jahiaUserManagerService.userExists(email, siteKey)) {
+            ssoUserNode = this.jahiaUserManagerService.lookupUser(email, siteKey, this.sessionWrapper);
             JCRNodeWrapper jcrNodeWrapper = ssoUserNode.getDecoratedNode();
             boolean isUpdated = this.updateProperties(jcrNodeWrapper, saml2Profile);
             //saving session if any property is updated for user.
@@ -142,7 +146,7 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
             }
         } else {
             // TODO: generate random password
-            ssoUserNode = jahiaUserManagerService.createUser(email, SAML2Constants.siteKey,
+            ssoUserNode = jahiaUserManagerService.createUser(email, siteKey,
                     "SAH-1*", this.initialProperties(saml2Profile), this.sessionWrapper);
             this.sessionWrapper.save();
         }
@@ -154,9 +158,9 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
      */
     private Properties initialProperties(SAML2Profile saml2Profile) {
         Properties properties = new Properties();
-        properties.setProperty(USER_PROPERTY_EMAIL, this.getProfileAttribute(SAML2_USER_PROPERTY_EMAIL, saml2Profile));
-        properties.setProperty(USER_PROPERTY_LASTNAME, this.getProfileAttribute(SAML2_USER_PROPERTY_LASTNAME, saml2Profile));
-        properties.setProperty(USER_PROPERTY_FIRSTNAME, this.getProfileAttribute(SAML2_USER_PROPERTY_FIRSTNAME, saml2Profile));
+        properties.setProperty(JCRConstants.USER_PROPERTY_EMAIL, this.getProfileAttribute(SAML2Constants.SAML2_USER_PROPERTY_EMAIL, saml2Profile));
+        properties.setProperty(JCRConstants.USER_PROPERTY_LASTNAME, this.getProfileAttribute(SAML2Constants.SAML2_USER_PROPERTY_LASTNAME, saml2Profile));
+        properties.setProperty(JCRConstants.USER_PROPERTY_FIRSTNAME, this.getProfileAttribute(SAML2Constants.SAML2_USER_PROPERTY_FIRSTNAME, saml2Profile));
         return properties;
     }
 
@@ -169,24 +173,24 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
      */
     private boolean updateProperties(JCRNodeWrapper jcrNodeWrapper, SAML2Profile saml2Profile) throws RepositoryException {
         boolean isUpdated = false;
-        String email = this.getProfileAttribute(SAML2_USER_PROPERTY_EMAIL, saml2Profile);
-        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_EMAIL))
-                || !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_EMAIL).equals(email)) {
-            jcrNodeWrapper.setProperty(USER_PROPERTY_EMAIL, email);
+        String email = this.getProfileAttribute(SAML2Constants.SAML2_USER_PROPERTY_EMAIL, saml2Profile);
+        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(JCRConstants.USER_PROPERTY_EMAIL))
+                || !jcrNodeWrapper.getPropertyAsString(JCRConstants.USER_PROPERTY_EMAIL).equals(email)) {
+            jcrNodeWrapper.setProperty(JCRConstants.USER_PROPERTY_EMAIL, email);
             isUpdated = true;
         }
 
-        String lastname = this.getProfileAttribute(SAML2_USER_PROPERTY_LASTNAME, saml2Profile);
-        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_LASTNAME))
-                || !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_LASTNAME).equals(lastname)) {
-            jcrNodeWrapper.setProperty(USER_PROPERTY_LASTNAME, lastname);
+        String lastname = this.getProfileAttribute(SAML2Constants.SAML2_USER_PROPERTY_LASTNAME, saml2Profile);
+        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(JCRConstants.USER_PROPERTY_LASTNAME))
+                || !jcrNodeWrapper.getPropertyAsString(JCRConstants.USER_PROPERTY_LASTNAME).equals(lastname)) {
+            jcrNodeWrapper.setProperty(JCRConstants.USER_PROPERTY_LASTNAME, lastname);
             isUpdated = true;
         }
 
-        String firstname = this.getProfileAttribute(SAML2_USER_PROPERTY_FIRSTNAME, saml2Profile);
-        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_FIRSTNAME))
-                || !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_FIRSTNAME).equals(firstname)) {
-            jcrNodeWrapper.setProperty(USER_PROPERTY_FIRSTNAME, firstname);
+        String firstname = this.getProfileAttribute(SAML2Constants.SAML2_USER_PROPERTY_FIRSTNAME, saml2Profile);
+        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(JCRConstants.USER_PROPERTY_FIRSTNAME))
+                || !jcrNodeWrapper.getPropertyAsString(JCRConstants.USER_PROPERTY_FIRSTNAME).equals(firstname)) {
+            jcrNodeWrapper.setProperty(JCRConstants.USER_PROPERTY_FIRSTNAME, firstname);
             isUpdated = true;
         }
 
@@ -217,7 +221,9 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
     private String retrieveRedirectUrl(HttpServletRequest request) {
         String redirection = SAML2Util.getCookieValue(request, REDIRECT);
         if (StringUtils.isEmpty(redirection)) {
-            redirection = this.saml2SettingsService.getSettings(SAML2Constants.siteKey).getPostLoginPath();
+            // TODO: retrieve siteKey from the request
+            final String siteKey = "";
+            redirection = this.saml2SettingsService.getSettings(siteKey).getPostLoginPath();
             if (StringUtils.isEmpty(redirection)) {
                 // default value
                 redirection = "/";

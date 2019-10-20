@@ -183,7 +183,7 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
      * @return
      */
     public Set<String> getSupportedLocales() {
-        return supportedLocales;
+        return Collections.unmodifiableSet(supportedLocales);
     }
 
     /**

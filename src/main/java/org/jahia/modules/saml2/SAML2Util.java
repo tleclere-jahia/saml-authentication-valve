@@ -77,7 +77,9 @@ public class SAML2Util {
      */
     public static SAML2Client getSAML2Client(final SAML2SettingsService saml2SettingsService,
             final HttpServletRequest request) {
-        final SAML2Settings saml2Settings = saml2SettingsService.getSettings(SAML2Constants.siteKey);
+        // TODO: retrieve siteKey from the request
+        final String siteKey = "";
+        final SAML2Settings saml2Settings = saml2SettingsService.getSettings(siteKey);
         if (CLIENT == null) {
             initSAMLClient(saml2Settings, request);
         }

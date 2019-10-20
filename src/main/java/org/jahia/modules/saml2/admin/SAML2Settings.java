@@ -29,9 +29,8 @@ public class SAML2Settings {
 
     /**
      * @param siteKey
-     * @throws IOException
      */
-    public SAML2Settings(final String siteKey) throws IOException {
+    public SAML2Settings(final String siteKey) {
         this.siteKey = siteKey;
         this.enabled = true;
     }
@@ -102,9 +101,9 @@ public class SAML2Settings {
                                     postLoginPath = settingsNode
                                             .getProperty(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH).getString();
                                 }
-                                return true;
+                                return Boolean.TRUE;
                             }
-                            return false;
+                            return Boolean.FALSE;
                         }
                     });
 
