@@ -1,11 +1,21 @@
 package org.jahia.modules.saml2.valve;
 
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Properties;
+import javax.jcr.RepositoryException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.bin.Login;
 import org.jahia.modules.saml2.SAML2Constants;
+import static org.jahia.modules.saml2.SAML2Constants.*;
 import org.jahia.modules.saml2.SAML2Util;
 import org.jahia.modules.saml2.admin.SAML2SettingsService;
+import static org.jahia.modules.saml2.utils.JCRConstants.*;
 import org.jahia.params.valves.AuthValveContext;
 import org.jahia.params.valves.AutoRegisteredBaseAuthValve;
 import org.jahia.params.valves.LoginEngineAuthValveImpl;
@@ -25,19 +35,8 @@ import org.pac4j.saml.profile.SAML2Profile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jcr.RepositoryException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Properties;
-
-import static org.jahia.modules.saml2.SAML2Constants.*;
-import static org.jahia.modules.saml2.utils.JCRConstants.*;
-
 public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationValve.class);
     private static final String CMS_PREFIX = "/cms";
     private static final String REDIRECT = "redirect";
@@ -46,7 +45,6 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
     private JCRSessionWrapper sessionWrapper;
     private JahiaUserManagerService jahiaUserManagerService;
 
-
     /**
      * @param context
      * @param valveContext
@@ -54,11 +52,10 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
      */
     @Override
     public void invoke(final Object context,
-                       final ValveContext valveContext) throws PipelineException {
+            final ValveContext valveContext) throws PipelineException {
         final AuthValveContext authContext = (AuthValveContext) context;
         final HttpServletRequest request = authContext.getRequest();
         final HttpServletResponse response = authContext.getResponse();
-
 
         final boolean isSAMLLoginProcess = CMS_PREFIX.equals(request.getServletPath())
                 && (Login.getMapping()).equals(request.getPathInfo());
@@ -96,7 +93,6 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 final SAML2Profile saml2Profile = client.getUserProfile(saml2Credentials, webContext);
                 final String email = saml2Profile.getEmail();
                 LOGGER.debug("email of SAML Profile: " + email);
-
 
                 JCRUserNode jahiaUserNode = null;
 
@@ -139,12 +135,13 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
         if (this.jahiaUserManagerService.userExists(email, SAML2Constants.siteKey)) {
             ssoUserNode = this.jahiaUserManagerService.lookupUser(email, SAML2Constants.siteKey, this.sessionWrapper);
             JCRNodeWrapper jcrNodeWrapper = ssoUserNode.getDecoratedNode();
-            boolean isUpdated =  this.updateProperties(jcrNodeWrapper, saml2Profile);
+            boolean isUpdated = this.updateProperties(jcrNodeWrapper, saml2Profile);
             //saving session if any property is updated for user.
             if (isUpdated) {
                 this.sessionWrapper.save();
             }
         } else {
+            // TODO: generate random password
             ssoUserNode = jahiaUserManagerService.createUser(email, SAML2Constants.siteKey,
                     "SAH-1*", this.initialProperties(saml2Profile), this.sessionWrapper);
             this.sessionWrapper.save();
@@ -173,22 +170,22 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
     private boolean updateProperties(JCRNodeWrapper jcrNodeWrapper, SAML2Profile saml2Profile) throws RepositoryException {
         boolean isUpdated = false;
         String email = this.getProfileAttribute(SAML2_USER_PROPERTY_EMAIL, saml2Profile);
-        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_EMAIL)) ||
-                !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_EMAIL).equals(email)) {
+        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_EMAIL))
+                || !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_EMAIL).equals(email)) {
             jcrNodeWrapper.setProperty(USER_PROPERTY_EMAIL, email);
             isUpdated = true;
         }
 
         String lastname = this.getProfileAttribute(SAML2_USER_PROPERTY_LASTNAME, saml2Profile);
-        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_LASTNAME)) ||
-                !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_LASTNAME).equals(lastname)) {
+        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_LASTNAME))
+                || !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_LASTNAME).equals(lastname)) {
             jcrNodeWrapper.setProperty(USER_PROPERTY_LASTNAME, lastname);
             isUpdated = true;
         }
 
         String firstname = this.getProfileAttribute(SAML2_USER_PROPERTY_FIRSTNAME, saml2Profile);
-        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_FIRSTNAME)) ||
-                !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_FIRSTNAME).equals(firstname)) {
+        if (Objects.isNull(jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_FIRSTNAME))
+                || !jcrNodeWrapper.getPropertyAsString(USER_PROPERTY_FIRSTNAME).equals(firstname)) {
             jcrNodeWrapper.setProperty(USER_PROPERTY_FIRSTNAME, firstname);
             isUpdated = true;
         }
@@ -213,14 +210,15 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
 
     /**
      * Gets the redirection URL from the cookie, if not set takes the value is taken from the site settings
+     *
      * @param request : the http request
      * @return the redirection URL
      */
     private String retrieveRedirectUrl(HttpServletRequest request) {
         String redirection = SAML2Util.getCookieValue(request, REDIRECT);
-        if(StringUtils.isEmpty(redirection)) {
+        if (StringUtils.isEmpty(redirection)) {
             redirection = this.saml2SettingsService.getSettings(SAML2Constants.siteKey).getPostLoginPath();
-            if(StringUtils.isEmpty(redirection)) {
+            if (StringUtils.isEmpty(redirection)) {
                 // default value
                 redirection = "/";
             }
@@ -240,4 +238,3 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
         this.jahiaUserManagerService = jahiaUserManagerService;
     }
 }
-

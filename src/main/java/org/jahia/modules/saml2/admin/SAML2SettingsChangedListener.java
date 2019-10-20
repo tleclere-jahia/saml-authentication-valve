@@ -1,18 +1,18 @@
 package org.jahia.modules.saml2.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.jcr.RepositoryException;
+import javax.jcr.observation.Event;
+import javax.jcr.observation.EventIterator;
 import org.jahia.services.content.JCRContentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
-import javax.jcr.RepositoryException;
-import javax.jcr.observation.Event;
-import javax.jcr.observation.EventIterator;
-import java.util.ArrayList;
-import java.util.List;
-
 public class SAML2SettingsChangedListener implements ApplicationListener<ApplicationEvent> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsChangedListener.class);
     private SAML2SettingsService saml2SettingsService;
 
@@ -44,6 +44,7 @@ public class SAML2SettingsChangedListener implements ApplicationListener<Applica
      *
      */
     public static class SAML2SettingsChangedEvent extends ApplicationEvent {
+
         private static Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsChangedEvent.class);
         private List<String> affectedSites;
 

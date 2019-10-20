@@ -1,5 +1,12 @@
 package org.jahia.modules.saml2.admin;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.jcr.RepositoryException;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.saml2.SAML2Constants;
@@ -13,15 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import javax.jcr.RepositoryException;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 public class SAML2SettingsService implements InitializingBean, JahiaModuleAware {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsService.class);
     private static final SAML2SettingsService instance = new SAML2SettingsService();
     private Map<String, SAML2Settings> settingsBySiteKeyMap = new HashMap<>();
@@ -110,14 +110,14 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
      * @throws IOException
      */
     public SAML2Settings setSAML2Settings(final String siteKey,
-                                          final String identityProviderPath,
-                                          final String relyingPartyIdentifier,
-                                          final String incomingTargetUrl,
-                                          final String spMetaDataLocation,
-                                          final String keyStoreLocation,
-                                          final String keyStorePass,
-                                          final String privateKeyPass,
-                                          final String postLoginPath) throws IOException {
+            final String identityProviderPath,
+            final String relyingPartyIdentifier,
+            final String incomingTargetUrl,
+            final String spMetaDataLocation,
+            final String keyStoreLocation,
+            final String keyStorePass,
+            final String privateKeyPass,
+            final String postLoginPath) throws IOException {
         final SAML2Settings settings = new SAML2Settings(siteKey);
         settings.setIdentityProviderPath(identityProviderPath);
         settings.setRelyingPartyIdentifier(relyingPartyIdentifier);

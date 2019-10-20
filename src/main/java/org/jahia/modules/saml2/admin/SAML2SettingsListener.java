@@ -12,17 +12,18 @@
  * <p>
  * This file is part of a Jahia's Enterprise Distribution.
  * <p>
- * Jahia's Enterprise Distributions must be used in accordance with the terms
- * contained in the Jahia Solutions Group Terms & Conditions as well as
- * the Jahia Sustainable Enterprise License (JSEL).
+ * Jahia's Enterprise Distributions must be used in accordance with the terms contained in the Jahia Solutions Group
+ * Terms & Conditions as well as the Jahia Sustainable Enterprise License (JSEL).
  * <p>
- * For questions regarding licensing, support, production usage...
- * please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
+ * For questions regarding licensing, support, production usage... please contact our team at sales@jahia.com or go to
+ * http://www.jahia.com/license.
  * <p>
  * ==========================================================================================
  */
 package org.jahia.modules.saml2.admin;
 
+import javax.jcr.observation.Event;
+import javax.jcr.observation.EventIterator;
 import org.jahia.modules.saml2.SAML2Constants;
 import org.jahia.services.content.DefaultEventListener;
 import org.jahia.services.content.ExternalEventListener;
@@ -31,14 +32,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
-import javax.jcr.observation.Event;
-import javax.jcr.observation.EventIterator;
-
 /**
  * Listener to propagate settings info among cluster nodes
  */
 public class SAML2SettingsListener extends DefaultEventListener implements ExternalEventListener,
         ApplicationEventPublisherAware {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsListener.class);
     private ApplicationEventPublisher applicationEventPublisher;
 

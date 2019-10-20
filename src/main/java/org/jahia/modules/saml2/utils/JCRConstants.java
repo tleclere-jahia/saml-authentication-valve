@@ -1,6 +1,5 @@
 package org.jahia.modules.saml2.utils;
 
-
 public class JCRConstants {
 
     public static final String USER_PROPERTY_EMAIL = "j:email";

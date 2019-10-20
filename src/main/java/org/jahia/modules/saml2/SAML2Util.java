@@ -1,22 +1,20 @@
 package org.jahia.modules.saml2;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.saml2.admin.SAML2Settings;
 import org.jahia.modules.saml2.admin.SAML2SettingsService;
 import org.opensaml.core.config.InitializationService;
-import org.pac4j.core.util.CommonHelper;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
 public class SAML2Util {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Util.class);
     private static SAML2Client CLIENT;
-
 
     /**
      * SAML Initialization on class level.
@@ -41,14 +39,13 @@ public class SAML2Util {
      * @return
      */
     public static String getAssertionConsumerServiceUrl(final HttpServletRequest request,
-                                                        final String incoming) {
+            final String incoming) {
         final StringBuilder url = new StringBuilder();
         String serverName = request.getHeader("X-Forwarded-Server");
         if (StringUtils.isEmpty(serverName)) {
             serverName = request.getServerName();
         }
         url.append(request.getScheme()).append("://").append(serverName).append(incoming);
-        
 
         return url.toString();
     }
@@ -79,7 +76,7 @@ public class SAML2Util {
      * @return
      */
     public static SAML2Client getSAML2Client(final SAML2SettingsService saml2SettingsService,
-                                             final HttpServletRequest request) {
+            final HttpServletRequest request) {
         final SAML2Settings saml2Settings = saml2SettingsService.getSettings(SAML2Constants.siteKey);
         if (CLIENT == null) {
             initSAMLClient(saml2Settings, request);
@@ -94,25 +91,27 @@ public class SAML2Util {
      * @param request
      */
     private static void initSAMLClient(SAML2Settings saml2Settings, HttpServletRequest request) {
+        // TODO: refactor code to get a method to generation the SAML2ClientConfiguration object
         final SAML2ClientConfiguration saml2ClientConfiguration = new SAML2ClientConfiguration();
+        // TODO: set the IdentityProviderMetadata file from the JCR
         saml2ClientConfiguration.setIdentityProviderMetadataPath(saml2Settings.getIdentityProviderPath());
         saml2ClientConfiguration.setServiceProviderEntityId(saml2Settings.getRelyingPartyIdentifier());
+        // TODO: set the Keystore file from the JCR
         saml2ClientConfiguration.setKeystorePath(saml2Settings.getKeyStoreLocation());
         saml2ClientConfiguration.setKeystorePassword(saml2Settings.getKeyStorePass());
         saml2ClientConfiguration.setPrivateKeyPassword(saml2Settings.getPrivateKeyPass());
+        // TODO: set the ServiceProviderMetadata file from the JCR
         saml2ClientConfiguration.setServiceProviderMetadataPath(saml2Settings.getSpMetaDataLocation());
 
         CLIENT = new SAML2Client(saml2ClientConfiguration);
         CLIENT.setCallbackUrl(SAML2Util.getAssertionConsumerServiceUrl(request, saml2Settings.getIncomingTargetUrl()));
     }
 
-
-
     /**
      * @param request
      */
     public static String getCookieValue(final HttpServletRequest request,
-                                        final String name) {
+            final String name) {
         final Cookie[] cookies = request.getCookies();
         for (final Cookie cookie : cookies) {
             if (cookie.getName().equals(name)) {
@@ -123,8 +122,8 @@ public class SAML2Util {
     }
 
     /**
-     * Method to reset SAMLClient so that a new state {@link SAML2Client} can be
-     * generated, when it is requested the next time.
+     * Method to reset SAMLClient so that a new state {@link SAML2Client} can be generated, when it is requested the
+     * next time.
      */
     public static void resetClient() {
         CLIENT = null;

@@ -1,5 +1,7 @@
 package org.jahia.modules.saml2.admin;
 
+import java.io.IOException;
+import javax.jcr.RepositoryException;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.modules.saml2.SAML2Constants;
@@ -10,10 +12,8 @@ import org.jahia.services.content.JCRTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jcr.RepositoryException;
-import java.io.IOException;
-
 public class SAML2Settings {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Settings.class);
 
     private boolean enabled;
@@ -26,7 +26,6 @@ public class SAML2Settings {
     private String keyStorePass;
     private String privateKeyPass;
     private String postLoginPath;
-
 
     /**
      * @param siteKey
@@ -65,49 +64,49 @@ public class SAML2Settings {
             // read default settings
             final Boolean defaultSettingLoaded = JCRTemplate.getInstance()
                     .doExecuteWithSystemSessionAsUser(null, Constants.EDIT_WORKSPACE, null, new JCRCallback<Boolean>() {
-                public Boolean doInJCR(final JCRSessionWrapper session) throws RepositoryException {
-                    if (session.nodeExists("/sites/" + siteKey)
-                            && session.nodeExists("/sites/" + siteKey + "/" + SAML2Constants.SETTINGS_NODE_NAME)) {
-                        final JCRNodeWrapper settingsNode = session
-                                .getNode("/sites/" + siteKey + "/" + SAML2Constants.SETTINGS_NODE_NAME);
+                        public Boolean doInJCR(final JCRSessionWrapper session) throws RepositoryException {
+                            if (session.nodeExists("/sites/" + siteKey)
+                                    && session.nodeExists("/sites/" + siteKey + "/" + SAML2Constants.SETTINGS_NODE_NAME)) {
+                                final JCRNodeWrapper settingsNode = session
+                                        .getNode("/sites/" + siteKey + "/" + SAML2Constants.SETTINGS_NODE_NAME);
 
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_IDENTITY_PROVIDER_URL)) {
-                            identityProviderPath = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_IDENTITY_PROVIDER_URL).getString();
+                                if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_IDENTITY_PROVIDER_URL)) {
+                                    identityProviderPath = settingsNode
+                                            .getProperty(SAML2Constants.SETTINGS_SAML2_IDENTITY_PROVIDER_URL).getString();
+                                }
+                                if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_RELYING_PARTY_IDENTIFIER)) {
+                                    relyingPartyIdentifier = settingsNode
+                                            .getProperty(SAML2Constants.SETTINGS_SAML2_RELYING_PARTY_IDENTIFIER).getString();
+                                }
+                                if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_INCOMMING_TARGET_URL)) {
+                                    incomingTargetUrl = settingsNode
+                                            .getProperty(SAML2Constants.SETTINGS_SAML2_INCOMMING_TARGET_URL).getString();
+                                }
+                                if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_SP_META_DATA_LOCATION)) {
+                                    spMetaDataLocation = settingsNode
+                                            .getProperty(SAML2Constants.SETTINGS_SAML2_SP_META_DATA_LOCATION).getString();
+                                }
+                                if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_LOCATION)) {
+                                    keyStoreLocation = settingsNode
+                                            .getProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_LOCATION).getString();
+                                }
+                                if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS)) {
+                                    privateKeyPass = settingsNode
+                                            .getProperty(SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS).getString();
+                                }
+                                if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS)) {
+                                    keyStorePass = settingsNode
+                                            .getProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS).getString();
+                                }
+                                if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH)) {
+                                    postLoginPath = settingsNode
+                                            .getProperty(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH).getString();
+                                }
+                                return true;
+                            }
+                            return false;
                         }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_RELYING_PARTY_IDENTIFIER)) {
-                            relyingPartyIdentifier = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_RELYING_PARTY_IDENTIFIER).getString();
-                        }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_INCOMMING_TARGET_URL)) {
-                            incomingTargetUrl = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_INCOMMING_TARGET_URL).getString();
-                        }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_SP_META_DATA_LOCATION)) {
-                            spMetaDataLocation = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_SP_META_DATA_LOCATION).getString();
-                        }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_LOCATION)) {
-                            keyStoreLocation = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_LOCATION).getString();
-                        }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS)) {
-                            privateKeyPass = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS).getString();
-                        }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS)) {
-                            keyStorePass = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS).getString();
-                        }
-                        if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH)) {
-                            postLoginPath = settingsNode
-                                    .getProperty(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH).getString();
-                        }
-                        return true;
-                    }
-                    return false;
-                }
-            });
+                    });
 
             return defaultSettingLoaded;
         } catch (RepositoryException e) {
@@ -124,38 +123,38 @@ public class SAML2Settings {
             // store default props
             JCRTemplate.getInstance()
                     .doExecuteWithSystemSessionAsUser(null, Constants.EDIT_WORKSPACE, null, new JCRCallback<Boolean>() {
-                public Boolean doInJCR(final JCRSessionWrapper session) throws RepositoryException {
-                    final JCRNodeWrapper settingsNode;
-                    if (session.nodeExists("/sites/" + siteKey + "/" + SAML2Constants.SETTINGS_NODE_NAME)) {
-                        settingsNode = session.getNode("/sites/" + siteKey + "/" + SAML2Constants.SETTINGS_NODE_NAME);
-                    } else {
-                        settingsNode = session.getNode("/sites/" + siteKey).addNode(SAML2Constants.SETTINGS_NODE_NAME,
-                                SAML2Constants.SETTINGS_NODE_TYPE);
-                    }
+                        public Boolean doInJCR(final JCRSessionWrapper session) throws RepositoryException {
+                            final JCRNodeWrapper settingsNode;
+                            if (session.nodeExists("/sites/" + siteKey + "/" + SAML2Constants.SETTINGS_NODE_NAME)) {
+                                settingsNode = session.getNode("/sites/" + siteKey + "/" + SAML2Constants.SETTINGS_NODE_NAME);
+                            } else {
+                                settingsNode = session.getNode("/sites/" + siteKey).addNode(SAML2Constants.SETTINGS_NODE_NAME,
+                                        SAML2Constants.SETTINGS_NODE_TYPE);
+                            }
 
-                    boolean doSave = setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_IDENTITY_PROVIDER_URL,
-                            getIdentityProviderPath());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_RELYING_PARTY_IDENTIFIER,
-                            getRelyingPartyIdentifier());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_INCOMMING_TARGET_URL,
-                            getIncomingTargetUrl());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_SP_META_DATA_LOCATION,
-                            getSpMetaDataLocation());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_KEY_STORE_LOCATION,
-                            getKeyStoreLocation());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS,
-                            getKeyStorePass());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS,
-                            getPrivateKeyPass());
-                    doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH,
-                            getPostLoginPath());
+                            boolean doSave = setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_IDENTITY_PROVIDER_URL,
+                                    getIdentityProviderPath());
+                            doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_RELYING_PARTY_IDENTIFIER,
+                                    getRelyingPartyIdentifier());
+                            doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_INCOMMING_TARGET_URL,
+                                    getIncomingTargetUrl());
+                            doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_SP_META_DATA_LOCATION,
+                                    getSpMetaDataLocation());
+                            doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_KEY_STORE_LOCATION,
+                                    getKeyStoreLocation());
+                            doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_KEY_STORE_PASS,
+                                    getKeyStorePass());
+                            doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_PRIVATE_KEY_PASS,
+                                    getPrivateKeyPass());
+                            doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH,
+                                    getPostLoginPath());
 
-                    if (doSave) {
-                        session.save();
-                    }
-                    return Boolean.TRUE;
-                }
-            });
+                            if (doSave) {
+                                session.save();
+                            }
+                            return Boolean.TRUE;
+                        }
+                    });
         } catch (RepositoryException e) {
             LOGGER.error("Error storing settings into the repository.", e);
         }
@@ -169,8 +168,8 @@ public class SAML2Settings {
      * @throws RepositoryException
      */
     private boolean setProperty(final JCRNodeWrapper node,
-                                final String propertyName,
-                                final String value) throws RepositoryException {
+            final String propertyName,
+            final String value) throws RepositoryException {
         if ((!node.hasProperty(propertyName) && StringUtils.isNotEmpty(value))
                 || (node.hasProperty(propertyName)
                 && !StringUtils.equals(node.getProperty(propertyName).getString(), value))) {

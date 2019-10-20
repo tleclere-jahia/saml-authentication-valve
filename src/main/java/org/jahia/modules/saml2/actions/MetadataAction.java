@@ -1,5 +1,8 @@
 package org.jahia.modules.saml2.actions;
 
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.modules.saml2.SAML2Util;
@@ -16,11 +19,8 @@ import org.pac4j.saml.metadata.SAML2MetadataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Map;
-
 public class MetadataAction extends Action {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MetadataAction.class);
     private SAML2SettingsService saml2SettingsService;
 
@@ -37,11 +37,11 @@ public class MetadataAction extends Action {
      */
     @Override
     public ActionResult doExecute(final HttpServletRequest req,
-                                  final RenderContext renderContext,
-                                  final Resource resource,
-                                  final JCRSessionWrapper session,
-                                  final Map<String, List<String>> parameters,
-                                  final URLResolver urlResolver) throws Exception {
+            final RenderContext renderContext,
+            final Resource resource,
+            final JCRSessionWrapper session,
+            final Map<String, List<String>> parameters,
+            final URLResolver urlResolver) throws Exception {
         if (renderContext.getSite() == null) {
             return ActionResult.OK;
         }
@@ -49,9 +49,12 @@ public class MetadataAction extends Action {
             final String siteKey = renderContext.getSite().getSiteKey();
             final SAML2Settings saml2Settings = saml2SettingsService.getSettings(siteKey);
 
+            // TODO: refactor code to get a method to generation the SAML2ClientConfiguration object
             final SAML2ClientConfiguration saml2ClientConfiguration = new SAML2ClientConfiguration();
+            // TODO: set the IdentityProviderMetadata file from the JCR
             saml2ClientConfiguration.setIdentityProviderMetadataPath(saml2Settings.getIdentityProviderPath());
             saml2ClientConfiguration.setServiceProviderEntityId(saml2Settings.getRelyingPartyIdentifier());
+            // TODO: set the Keystore file from the JCR
             saml2ClientConfiguration.setKeystoreResource(CommonHelper.getResource(saml2Settings.getKeyStoreLocation()));
             saml2ClientConfiguration.setKeystorePassword(saml2Settings.getKeyStorePass());
             saml2ClientConfiguration.setPrivateKeyPassword(saml2Settings.getPrivateKeyPass());

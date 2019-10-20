@@ -1,6 +1,7 @@
 package org.jahia.modules.saml2;
 
 public class SAML2Constants {
+
     public static final String ENABLED = "enabled";
     public static final String IDENTITY_PROVIDER_URL = "identityProviderPath";
     public static final String RELYING_PARTY_IDENTIFIER = "relyingPartyIdentifier";
@@ -10,7 +11,6 @@ public class SAML2Constants {
     public static final String KEY_STORE_PASS = "keyStorePass";
     public static final String PRIVATE_KEY_PASS = "privateKeyPass";
     public static final String SITE = "site";
-
 
     public static final String SETTINGS_NODE_NAME = "saml2-settings";
     public static final String SETTINGS_NODE_TYPE = "saml2nt:settings";

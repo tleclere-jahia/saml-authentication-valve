@@ -12,18 +12,21 @@
  * <p>
  * This file is part of a Jahia's Enterprise Distribution.
  * <p>
- * Jahia's Enterprise Distributions must be used in accordance with the terms
- * contained in the Jahia Solutions Group Terms & Conditions as well as
- * the Jahia Sustainable Enterprise License (JSEL).
+ * Jahia's Enterprise Distributions must be used in accordance with the terms contained in the Jahia Solutions Group
+ * Terms & Conditions as well as the Jahia Sustainable Enterprise License (JSEL).
  * <p>
- * For questions regarding licensing, support, production usage...
- * please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
+ * For questions regarding licensing, support, production usage... please contact our team at sales@jahia.com or go to
+ * http://www.jahia.com/license.
  * <p>
  * ==========================================================================================
  */
 package org.jahia.modules.saml2.admin;
 
 import com.google.common.io.CharStreams;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
@@ -36,11 +39,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Map;
 
 public class SAML2SettingsAction extends Action {
 
@@ -60,10 +58,10 @@ public class SAML2SettingsAction extends Action {
      */
     @Override
     public ActionResult doExecute(final HttpServletRequest request,
-                                  final RenderContext renderContext,
-                                  final Resource resource,
-                                  final JCRSessionWrapper session, Map<String, List<String>> parameters,
-                                  final URLResolver urlResolver) throws Exception {
+            final RenderContext renderContext,
+            final Resource resource,
+            final JCRSessionWrapper session, Map<String, List<String>> parameters,
+            final URLResolver urlResolver) throws Exception {
         try {
             final String responseText = CharStreams.toString(request.getReader());
             final JSONObject settings;
@@ -94,7 +92,7 @@ public class SAML2SettingsAction extends Action {
                 if (enabled) {
                     serverSettings = saml2SettingsService.setSAML2Settings(siteKey,
                             identityProviderPath, relyingPartyIdentifier, incomingTargetUrl,
-                            spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass,postLoginPath);
+                            spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass, postLoginPath);
                 } else {
                     serverSettings = null;
                 }
@@ -137,8 +135,8 @@ public class SAML2SettingsAction extends Action {
      * @throws JSONException
      */
     private <T> T getSettingOrDefault(final JSONObject settings,
-                                      final String propertyName,
-                                      final T defaultValue) throws JSONException {
+            final String propertyName,
+            final T defaultValue) throws JSONException {
         return settings.has(propertyName) ? (T) settings.get(propertyName) : defaultValue;
     }
 
