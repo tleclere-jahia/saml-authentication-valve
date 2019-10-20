@@ -24,6 +24,7 @@ import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRUserNode;
+import org.jahia.services.seo.urlrewrite.ServerNameToSiteMapper;
 import org.jahia.services.usermanager.JahiaUser;
 import org.jahia.services.usermanager.JahiaUserManagerService;
 import org.pac4j.core.context.J2EContext;
@@ -68,8 +69,8 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
 
         // This is the starting process of the SAML authentication which redirects the user to the IDP login screen
         if (isSAMLLoginProcess) {
-            // TODO: retrieve siteKey from the request
-            final String siteKey = "";
+            // Récupération de la siteKey passée en paramètre
+            final String siteKey = ServerNameToSiteMapper.getSiteKeyByServerName(request);
             SAML2Util.initialize(() -> {
                 // Storing redirect url into cookie to be used when the request is send from IDP to continue the
                 // access to the secure resource
@@ -92,10 +93,11 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 LOGGER.debug("email of SAML Profile: " + email);
 
                 JCRUserNode jahiaUserNode = null;
-
+                // Récupération de la siteKey passée en paramètre
+                final String siteKey = ServerNameToSiteMapper.getSiteKeyByServerName(request);
                 if (StringUtils.isNotEmpty(email)) {
                     // TODO: split this processing of the user at the back-end level in the same way than the OAuth modules
-                    jahiaUserNode = this.processSSOUserInJcr(email, saml2Profile, request);
+                    jahiaUserNode = this.processSSOUserInJcr(email, saml2Profile, request, siteKey);
                     final JahiaUser jahiaUser = jahiaUserNode.getJahiaUser();
                     if (jahiaUser.isAccountLocked()) {
                         LOGGER.info("Login failed. Account is locked for user " + email);
@@ -107,7 +109,7 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 request.setAttribute(LoginEngineAuthValveImpl.VALVE_RESULT, LoginEngineAuthValveImpl.OK);
 
                 // Get the redirection URL from the cookie, if not set takes the value is taken from the site settings
-                String redirection = retrieveRedirectUrl(request);
+                String redirection = retrieveRedirectUrl(request, siteKey);
                 response.sendRedirect(redirection);
                 return;
             });
@@ -124,15 +126,13 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
      * @return
      * @throws RepositoryException
      */
-    private JCRUserNode processSSOUserInJcr(String email, SAML2Profile saml2Profile, HttpServletRequest request) throws RepositoryException {
+    private JCRUserNode processSSOUserInJcr(String email, SAML2Profile saml2Profile, HttpServletRequest request, String siteKey) throws RepositoryException {
         this.sessionWrapper = JCRSessionFactory.getInstance()
                 .getCurrentSystemSession(
                         null,
                         (request.getLocale() != null) ? request.getLocale() : new Locale(DEFAULT_LOCALE),
                         new Locale(DEFAULT_LOCALE));
         JCRUserNode ssoUserNode = null;
-        // TODO: retrieve siteKey from the request
-        final String siteKey = "";
         if (this.jahiaUserManagerService.userExists(email, siteKey)) {
             ssoUserNode = this.jahiaUserManagerService.lookupUser(email, siteKey, this.sessionWrapper);
             JCRNodeWrapper jcrNodeWrapper = ssoUserNode.getDecoratedNode();
@@ -215,11 +215,9 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
      * @param request : the http request
      * @return the redirection URL
      */
-    private String retrieveRedirectUrl(HttpServletRequest request) {
+    private String retrieveRedirectUrl(HttpServletRequest request, String siteKey) {
         String redirection = SAML2Util.getCookieValue(request, REDIRECT);
         if (StringUtils.isEmpty(redirection)) {
-            // TODO: retrieve siteKey from the request
-            final String siteKey = "";
             redirection = this.saml2SettingsService.getSettings(siteKey).getPostLoginPath();
             if (StringUtils.isEmpty(redirection)) {
                 // default value
