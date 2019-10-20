@@ -99,6 +99,7 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 JCRUserNode jahiaUserNode = null;
 
                 if (StringUtils.isNotEmpty(email)) {
+                    // TODO: split this processing of the user at the back-end level in the same way than the OAuth modules
                     jahiaUserNode = this.processSSOUserInJcr(email, saml2Profile, request);
                     final JahiaUser jahiaUser = jahiaUserNode.getJahiaUser();
                     if (jahiaUser.isAccountLocked()) {

@@ -14,7 +14,10 @@ import org.slf4j.LoggerFactory;
 public class SAML2Util {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Util.class);
-    private static SAML2Client CLIENT;
+    private static SAML2Client client;
+
+    private SAML2Util() {
+    }
 
     /**
      * SAML Initialization on class level.
@@ -26,8 +29,8 @@ public class SAML2Util {
         thread.setContextClassLoader(InitializationService.class.getClassLoader());
         try {
             InitializationService.initialize();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (Exception ex) {
+            LOGGER.error("Impossible to initialize", ex);
         } finally {
             // reset TCCL
             thread.setContextClassLoader(loader);
@@ -60,8 +63,8 @@ public class SAML2Util {
         thread.setContextClassLoader(InitializationService.class.getClassLoader());
         try {
             callBack.execute();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (Exception ex) {
+            LOGGER.error("Impossible to execute the callback", ex);
         } finally {
             // reset TCCL
             thread.setContextClassLoader(loader);
@@ -80,10 +83,10 @@ public class SAML2Util {
         // TODO: retrieve siteKey from the request
         final String siteKey = "";
         final SAML2Settings saml2Settings = saml2SettingsService.getSettings(siteKey);
-        if (CLIENT == null) {
+        if (client == null) {
             initSAMLClient(saml2Settings, request);
         }
-        return CLIENT;
+        return client;
     }
 
     /**
@@ -105,8 +108,8 @@ public class SAML2Util {
         // TODO: set the ServiceProviderMetadata file from the JCR
         saml2ClientConfiguration.setServiceProviderMetadataPath(saml2Settings.getSpMetaDataLocation());
 
-        CLIENT = new SAML2Client(saml2ClientConfiguration);
-        CLIENT.setCallbackUrl(SAML2Util.getAssertionConsumerServiceUrl(request, saml2Settings.getIncomingTargetUrl()));
+        client = new SAML2Client(saml2ClientConfiguration);
+        client.setCallbackUrl(SAML2Util.getAssertionConsumerServiceUrl(request, saml2Settings.getIncomingTargetUrl()));
     }
 
     /**
@@ -128,6 +131,6 @@ public class SAML2Util {
      * next time.
      */
     public static void resetClient() {
-        CLIENT = null;
+        client = null;
     }
 }
