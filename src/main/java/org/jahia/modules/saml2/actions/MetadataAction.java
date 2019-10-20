@@ -16,12 +16,9 @@ import org.pac4j.core.util.CommonHelper;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
 import org.pac4j.saml.crypto.KeyStoreCredentialProvider;
 import org.pac4j.saml.metadata.SAML2MetadataGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MetadataAction extends Action {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetadataAction.class);
     private SAML2SettingsService saml2SettingsService;
 
     @Override

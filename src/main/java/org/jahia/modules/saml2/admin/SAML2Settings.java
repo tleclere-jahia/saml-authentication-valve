@@ -1,6 +1,5 @@
 package org.jahia.modules.saml2.admin;
 
-import java.io.IOException;
 import javax.jcr.RepositoryException;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
@@ -16,15 +15,15 @@ public class SAML2Settings {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Settings.class);
     private boolean enabled;
-    private String siteKey;
     private String identityProviderPath;
-    private String relyingPartyIdentifier;
     private String incomingTargetUrl;
-    private String spMetaDataLocation;
     private String keyStoreLocation;
     private String keyStorePass;
-    private String privateKeyPass;
     private String postLoginPath;
+    private String privateKeyPass;
+    private String relyingPartyIdentifier;
+    private String siteKey;
+    private String spMetaDataLocation;
 
     public SAML2Settings(final String siteKey) {
         this.siteKey = siteKey;

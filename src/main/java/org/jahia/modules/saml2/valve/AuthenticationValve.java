@@ -38,8 +38,8 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationValve.class);
     private static final String CMS_PREFIX = "/cms";
+    private static final String DEFAULT_LOCALE = "en_US";
     private static final String REDIRECT = "redirect";
-    private static final String defaultLocale = "en_US";
     private SAML2SettingsService saml2SettingsService;
     private JCRSessionWrapper sessionWrapper;
     private JahiaUserManagerService jahiaUserManagerService;
@@ -127,8 +127,8 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
         this.sessionWrapper = JCRSessionFactory.getInstance()
                 .getCurrentSystemSession(
                         null,
-                        (request.getLocale() != null) ? request.getLocale() : new Locale(defaultLocale),
-                        new Locale(defaultLocale));
+                        (request.getLocale() != null) ? request.getLocale() : new Locale(DEFAULT_LOCALE),
+                        new Locale(DEFAULT_LOCALE));
         JCRUserNode ssoUserNode = null;
         // TODO: retrieve siteKey from the request
         final String siteKey = "";

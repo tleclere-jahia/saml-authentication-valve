@@ -23,7 +23,7 @@ import org.springframework.beans.factory.InitializingBean;
 public class SAML2SettingsService implements InitializingBean, JahiaModuleAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsService.class);
-    private static final SAML2SettingsService instance = new SAML2SettingsService();
+    private static final SAML2SettingsService INSTANCE = new SAML2SettingsService();
     private Map<String, SAML2Settings> settingsBySiteKeyMap = new HashMap<>();
     private String resourceBundleName;
     private JahiaTemplatesPackage module;
@@ -33,8 +33,8 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         super();
     }
 
-    public static SAML2SettingsService getInstance() {
-        return instance;
+    public static SAML2SettingsService getINSTANCE() {
+        return INSTANCE;
     }
 
     public void loadSettings(final String siteKey) throws RepositoryException {
