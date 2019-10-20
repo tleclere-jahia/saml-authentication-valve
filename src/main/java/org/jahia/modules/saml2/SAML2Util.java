@@ -72,9 +72,7 @@ public final class SAML2Util {
      * @return
      */
     public static SAML2Client getSAML2Client(final SAML2SettingsService saml2SettingsService,
-            final HttpServletRequest request) {
-        // TODO: retrieve siteKey from the request
-        final String siteKey = "";
+            final HttpServletRequest request, String siteKey) {
         final SAML2Settings saml2Settings = saml2SettingsService.getSettings(siteKey);
         if (client == null) {
             initSAMLClient(saml2Settings, request);
@@ -91,6 +89,8 @@ public final class SAML2Util {
     private static void initSAMLClient(SAML2Settings saml2Settings, HttpServletRequest request) {
         // TODO: refactor code to get a method to generation the SAML2ClientConfiguration object
         final SAML2ClientConfiguration saml2ClientConfiguration = new SAML2ClientConfiguration();
+        // TODO: add this parameter to the valve configuration in the JCR
+        saml2ClientConfiguration.setMaximumAuthenticationLifetime(18000);
         // TODO: set the IdentityProviderMetadata file from the JCR
         saml2ClientConfiguration.setIdentityProviderMetadataPath(saml2Settings.getIdentityProviderPath());
         saml2ClientConfiguration.setServiceProviderEntityId(saml2Settings.getRelyingPartyIdentifier());

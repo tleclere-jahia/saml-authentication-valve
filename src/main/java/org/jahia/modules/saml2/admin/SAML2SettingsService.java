@@ -33,7 +33,7 @@ public final class SAML2SettingsService implements InitializingBean, JahiaModule
         super();
     }
 
-    public static SAML2SettingsService getINSTANCE() {
+    public static SAML2SettingsService getInstance() {
         return INSTANCE;
     }
 
