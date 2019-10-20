@@ -1,9 +1,11 @@
 package org.jahia.modules.saml2.valve;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.logging.Level;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -20,11 +22,15 @@ import org.jahia.params.valves.AutoRegisteredBaseAuthValve;
 import org.jahia.params.valves.LoginEngineAuthValveImpl;
 import org.jahia.pipelines.PipelineException;
 import org.jahia.pipelines.valves.ValveContext;
+import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.content.decorator.JCRUserNode;
 import org.jahia.services.seo.urlrewrite.ServerNameToSiteMapper;
+import org.jahia.services.sites.JahiaSite;
+import org.jahia.services.sites.JahiaSitesService;
 import org.jahia.services.usermanager.JahiaUser;
 import org.jahia.services.usermanager.JahiaUserManagerService;
 import org.pac4j.core.context.J2EContext;
@@ -58,63 +64,78 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
         final boolean isSAMLIncomingLoginProcess = CMS_PREFIX.equals(request.getServletPath())
                 && (Login.getMapping() + ".SAML.incoming").equals(request.getPathInfo());
 
-        // check on the domain to make sure the valve is enabled only on the right site and check on site key as it a mandatory value
-        // TODO: check if the module is activated for the current website
-        final boolean enabled = true;
+        // Récupération de la siteKey passée en paramètre
+        final String siteKey = ServerNameToSiteMapper.getSiteKeyByServerName(request);
 
-        if (!enabled) {
-            valveContext.invokeNext(context);
-            return;
-        }
-
-        // This is the starting process of the SAML authentication which redirects the user to the IDP login screen
-        if (isSAMLLoginProcess) {
-            // Récupération de la siteKey passée en paramètre
-            final String siteKey = ServerNameToSiteMapper.getSiteKeyByServerName(request);
-            SAML2Util.initialize(() -> {
-                // Storing redirect url into cookie to be used when the request is send from IDP to continue the
-                // access to the secure resource
-                response.addCookie(new Cookie(REDIRECT, request.getParameter(REDIRECT).replaceAll("\n\r", "")));
-                response.addCookie(new Cookie(siteKey, request.getParameter(SAML2Constants.SITE).replaceAll("\n\r", "")));
-
-                final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request);
-                final J2EContext webContext = new J2EContext(request, response);
-                final HttpAction action = client.redirect(webContext);
-                response.getWriter().flush();
-                LOGGER.info(action.getMessage());
-            });
-        } else if (isSAMLIncomingLoginProcess) {
-            SAML2Util.initialize(() -> {
-                final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request);
-                final J2EContext webContext = new J2EContext(request, response);
-                final SAML2Credentials saml2Credentials = client.getCredentials(webContext);
-                final SAML2Profile saml2Profile = client.getUserProfile(saml2Credentials, webContext);
-                final String email = saml2Profile.getEmail();
-                LOGGER.debug("email of SAML Profile: " + email);
-
-                JCRUserNode jahiaUserNode = null;
-                // Récupération de la siteKey passée en paramètre
-                final String siteKey = ServerNameToSiteMapper.getSiteKeyByServerName(request);
-                if (StringUtils.isNotEmpty(email)) {
-                    // TODO: split this processing of the user at the back-end level in the same way than the OAuth modules
-                    jahiaUserNode = this.processSSOUserInJcr(email, saml2Profile, request, siteKey);
-                    final JahiaUser jahiaUser = jahiaUserNode.getJahiaUser();
-                    if (jahiaUser.isAccountLocked()) {
-                        LOGGER.info("Login failed. Account is locked for user " + email);
+        boolean enabled = false;
+        try {
+            enabled = JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Boolean>() {
+                @Override
+                public Boolean doInJCR(JCRSessionWrapper session) {
+                    try {
+                        final JahiaSitesService siteService = JahiaSitesService.getInstance();
+                        final JahiaSite site = siteService.getSiteByKey(siteKey, session);
+                        final List<String> installedModules = site.getInstalledModules();
+                        return installedModules.contains("saml-authentication-valve");
+                    } catch (RepositoryException ex) {
+                        LOGGER.error("Impossible to verify the current site", ex);
                     }
-                    authContext.getSessionFactory().setCurrentUser(jahiaUser);
-                    request.getSession().setAttribute(Constants.SESSION_USER, jahiaUser);
+                    return false;
                 }
-
-                request.setAttribute(LoginEngineAuthValveImpl.VALVE_RESULT, LoginEngineAuthValveImpl.OK);
-
-                // Get the redirection URL from the cookie, if not set takes the value is taken from the site settings
-                String redirection = retrieveRedirectUrl(request, siteKey);
-                response.sendRedirect(redirection);
-                return;
             });
+        } catch (RepositoryException ex) {
+            LOGGER.error(String.format("Impossible to check if the SAML is enabled for %s"), siteKey);
         }
-        valveContext.invokeNext(context);
+
+        if (enabled) {
+
+            // This is the starting process of the SAML authentication which redirects the user to the IDP login screen
+            if (isSAMLLoginProcess) {
+                SAML2Util.initialize(() -> {
+                    // Storing redirect url into cookie to be used when the request is send from IDP to continue the
+                    // access to the secure resource
+                    response.addCookie(new Cookie(REDIRECT, request.getParameter(REDIRECT).replaceAll("\n\r", "")));
+                    response.addCookie(new Cookie(siteKey, request.getParameter(SAML2Constants.SITE).replaceAll("\n\r", "")));
+
+                    final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request);
+                    final J2EContext webContext = new J2EContext(request, response);
+                    final HttpAction action = client.redirect(webContext);
+                    response.getWriter().flush();
+                    LOGGER.info(action.getMessage());
+                });
+            } else if (isSAMLIncomingLoginProcess) {
+                SAML2Util.initialize(() -> {
+                    final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request);
+                    final J2EContext webContext = new J2EContext(request, response);
+                    final SAML2Credentials saml2Credentials = client.getCredentials(webContext);
+                    final SAML2Profile saml2Profile = client.getUserProfile(saml2Credentials, webContext);
+                    final String email = saml2Profile.getEmail();
+                    LOGGER.debug("email of SAML Profile: " + email);
+
+                    JCRUserNode jahiaUserNode = null;
+                    if (StringUtils.isNotEmpty(email)) {
+                        // TODO: split this processing of the user at the back-end level in the same way than the OAuth modules
+                        jahiaUserNode = this.processSSOUserInJcr(email, saml2Profile, request, siteKey);
+                        final JahiaUser jahiaUser = jahiaUserNode.getJahiaUser();
+                        if (jahiaUser.isAccountLocked()) {
+                            LOGGER.info("Login failed. Account is locked for user " + email);
+                        }
+                        authContext.getSessionFactory().setCurrentUser(jahiaUser);
+                        request.getSession().setAttribute(Constants.SESSION_USER, jahiaUser);
+                    }
+
+                    request.setAttribute(LoginEngineAuthValveImpl.VALVE_RESULT, LoginEngineAuthValveImpl.OK);
+
+                    // Get the redirection URL from the cookie, if not set takes the value is taken from the site settings
+                    String redirection = retrieveRedirectUrl(request, siteKey);
+                    response.sendRedirect(redirection);
+                    return;
+                });
+            }
+        } else {
+            valveContext.invokeNext(context);
+        }
+
     }
 
     /**
