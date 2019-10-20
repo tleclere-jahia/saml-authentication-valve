@@ -37,10 +37,6 @@ public class SAML2Util {
         }
     }
 
-    /**
-     * @param request
-     * @return
-     */
     public static String getAssertionConsumerServiceUrl(final HttpServletRequest request,
             final String incoming) {
         final StringBuilder url = new StringBuilder();
@@ -53,9 +49,6 @@ public class SAML2Util {
         return url.toString();
     }
 
-    /**
-     *
-     */
     public static void initialize(final SAML2CallBack callBack) {
         // adapt TCCL
         final Thread thread = Thread.currentThread();
@@ -112,9 +105,6 @@ public class SAML2Util {
         client.setCallbackUrl(SAML2Util.getAssertionConsumerServiceUrl(request, saml2Settings.getIncomingTargetUrl()));
     }
 
-    /**
-     * @param request
-     */
     public static String getCookieValue(final HttpServletRequest request,
             final String name) {
         final Cookie[] cookies = request.getCookies();

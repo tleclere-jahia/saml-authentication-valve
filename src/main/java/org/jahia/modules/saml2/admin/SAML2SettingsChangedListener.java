@@ -17,9 +17,6 @@ public class SAML2SettingsChangedListener implements ApplicationListener<Applica
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsChangedListener.class);
     private SAML2SettingsService saml2SettingsService;
 
-    /**
-     * @param event
-     */
     @Override
     public void onApplicationEvent(final ApplicationEvent event) {
         if (event instanceof SAML2SettingsChangedEvent) {
@@ -33,17 +30,10 @@ public class SAML2SettingsChangedListener implements ApplicationListener<Applica
         }
     }
 
-    /**
-     *
-     * @param saml2SettingsService
-     */
     public void setSaml2SettingsService(final SAML2SettingsService saml2SettingsService) {
         this.saml2SettingsService = saml2SettingsService;
     }
 
-    /**
-     *
-     */
     public static class SAML2SettingsChangedEvent extends ApplicationEvent {
 
         private static Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsChangedEvent.class);
@@ -71,10 +61,6 @@ public class SAML2SettingsChangedListener implements ApplicationListener<Applica
             }
         }
 
-        /**
-         *
-         * @return
-         */
         public List<String> getAffectedSites() {
             return Collections.unmodifiableList(affectedSites);
         }

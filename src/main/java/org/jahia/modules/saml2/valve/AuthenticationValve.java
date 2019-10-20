@@ -44,11 +44,6 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
     private JCRSessionWrapper sessionWrapper;
     private JahiaUserManagerService jahiaUserManagerService;
 
-    /**
-     * @param context
-     * @param valveContext
-     * @throws PipelineException
-     */
     @Override
     public void invoke(final Object context,
             final ValveContext valveContext) throws PipelineException {
@@ -234,9 +229,6 @@ public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
         return redirection;
     }
 
-    /**
-     * @param saml2SettingsService
-     */
     public void setSaml2SettingsService(final SAML2SettingsService saml2SettingsService) {
         this.saml2SettingsService = saml2SettingsService;
     }

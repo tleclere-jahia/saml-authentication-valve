@@ -29,34 +29,17 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
     private JahiaTemplatesPackage module;
     private Set<String> supportedLocales = Collections.emptySet();
 
-    /**
-     *
-     */
     private SAML2SettingsService() {
         super();
     }
 
-    /**
-     *
-     * @return
-     */
     public static SAML2SettingsService getInstance() {
         return instance;
     }
 
-    /**
-     * @param siteKey
-     * @throws RepositoryException
-     */
     public void loadSettings(final String siteKey) throws RepositoryException {
         JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Object>() {
-
-            /**
-             *
-             * @param session
-             * @return
-             * @throws RepositoryException
-             */
+            
             @Override
             public Object doInJCR(final JCRSessionWrapper session) throws RepositoryException {
                 //clean up
@@ -74,11 +57,6 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
                 return null;
             }
 
-            /**
-             *
-             * @param siteNode
-             * @throws RepositoryException
-             */
             private void loadSettings(final JCRSiteNode siteNode) throws RepositoryException {
                 boolean loaded;
                 try {
@@ -96,19 +74,6 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         });
     }
 
-    /**
-     *
-     * @param siteKey
-     * @param identityProviderPath
-     * @param relyingPartyIdentifier
-     * @param incomingTargetUrl
-     * @param spMetaDataLocation
-     * @param keyStoreLocation
-     * @param keyStorePass
-     * @param privateKeyPass
-     * @return
-     * @throws IOException
-     */
     public SAML2Settings setSAML2Settings(final String siteKey,
             final String identityProviderPath,
             final String relyingPartyIdentifier,
@@ -135,10 +100,6 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         return settings;
     }
 
-    /**
-     *
-     * @param siteKey
-     */
     public void removeServerSettings(String siteKey) {
         if (settingsBySiteKeyMap.containsKey(siteKey)) {
             settingsBySiteKeyMap.get(siteKey).remove();
@@ -154,10 +115,6 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         return settingsBySiteKeyMap.get(siteKey);
     }
 
-    /**
-     *
-     * @param jahiaTemplatesPackage
-     */
     @Override
     public void setJahiaModule(final JahiaTemplatesPackage jahiaTemplatesPackage) {
         this.module = jahiaTemplatesPackage;
@@ -178,26 +135,14 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         }
     }
 
-    /**
-     *
-     * @return
-     */
     public Set<String> getSupportedLocales() {
         return Collections.unmodifiableSet(supportedLocales);
     }
 
-    /**
-     *
-     * @return
-     */
     public String getResourceBundleName() {
         return resourceBundleName;
     }
 
-    /**
-     *
-     * @throws Exception
-     */
     @Override
     public void afterPropertiesSet() throws Exception {
         loadSettings(null);

@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 public class SAML2Settings {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Settings.class);
-
     private boolean enabled;
     private String siteKey;
     private String identityProviderPath;
@@ -27,17 +26,11 @@ public class SAML2Settings {
     private String privateKeyPass;
     private String postLoginPath;
 
-    /**
-     * @param siteKey
-     */
     public SAML2Settings(final String siteKey) {
         this.siteKey = siteKey;
         this.enabled = true;
     }
 
-    /**
-     *
-     */
     public void remove() {
         try {
             // store settings
@@ -55,9 +48,6 @@ public class SAML2Settings {
         }
     }
 
-    /**
-     * @return
-     */
     public boolean load() {
         try {
             // read default settings
@@ -114,9 +104,6 @@ public class SAML2Settings {
         return false;
     }
 
-    /**
-     *
-     */
     public void store() {
         try {
             // store default props
@@ -159,13 +146,6 @@ public class SAML2Settings {
         }
     }
 
-    /**
-     * @param node
-     * @param propertyName
-     * @param value
-     * @return
-     * @throws RepositoryException
-     */
     private boolean setProperty(final JCRNodeWrapper node,
             final String propertyName,
             final String value) throws RepositoryException {

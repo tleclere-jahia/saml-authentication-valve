@@ -23,17 +23,6 @@ public class SAML2SettingsAction extends Action {
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsAction.class);
     private SAML2SettingsService saml2SettingsService;
 
-    /**
-     *
-     * @param request
-     * @param renderContext
-     * @param resource
-     * @param session
-     * @param parameters
-     * @param urlResolver
-     * @return
-     * @throws Exception
-     */
     @Override
     public ActionResult doExecute(final HttpServletRequest request,
             final RenderContext renderContext,
@@ -103,25 +92,12 @@ public class SAML2SettingsAction extends Action {
         }
     }
 
-    /**
-     *
-     * @param settings
-     * @param propertyName
-     * @param defaultValue
-     * @param <T>
-     * @return
-     * @throws JSONException
-     */
     private <T> T getSettingOrDefault(final JSONObject settings,
             final String propertyName,
             final T defaultValue) throws JSONException {
         return settings.has(propertyName) ? (T) settings.get(propertyName) : defaultValue;
     }
 
-    /**
-     *
-     * @param saml2SettingsService
-     */
     public void setSaml2SettingsService(final SAML2SettingsService saml2SettingsService) {
         this.saml2SettingsService = saml2SettingsService;
     }

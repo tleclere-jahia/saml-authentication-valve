@@ -24,17 +24,6 @@ public class MetadataAction extends Action {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetadataAction.class);
     private SAML2SettingsService saml2SettingsService;
 
-    /**
-     *
-     * @param req
-     * @param renderContext
-     * @param resource
-     * @param session
-     * @param parameters
-     * @param urlResolver
-     * @return
-     * @throws Exception
-     */
     @Override
     public ActionResult doExecute(final HttpServletRequest req,
             final RenderContext renderContext,

@@ -26,15 +26,4 @@ public class SAML2Constants {
     public static final String SAML2_USER_PROPERTY_EMAIL = "Email";
     public static final String SAML2_USER_PROPERTY_FIRSTNAME = "First Name";
     public static final String SAML2_USER_PROPERTY_LASTNAME = "Last Name";
-//
-//    public static String SERVER_NAME;
-//    public static String SITE_KEY;
-//
-//    public static void setSERVER_NAME(String SERVER_NAME) {
-//        SAML2Constants.SERVER_NAME = SERVER_NAME;
-//    }
-//
-//    public static void setSITE_KEY(String SITE_KEY) {
-//        SAML2Constants.SITE_KEY = SITE_KEY;
-//    }
 }
