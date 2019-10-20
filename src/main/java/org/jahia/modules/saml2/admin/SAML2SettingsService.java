@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-public class SAML2SettingsService implements InitializingBean, JahiaModuleAware {
+public final class SAML2SettingsService implements InitializingBean, JahiaModuleAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsService.class);
     private static final SAML2SettingsService INSTANCE = new SAML2SettingsService();

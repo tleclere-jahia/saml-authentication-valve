@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
 /**
  * Listener to propagate settings info among cluster nodes
  */
-public class SAML2SettingsListener extends DefaultEventListener implements ExternalEventListener,
+public final class SAML2SettingsListener extends DefaultEventListener implements ExternalEventListener,
         ApplicationEventPublisherAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsListener.class);

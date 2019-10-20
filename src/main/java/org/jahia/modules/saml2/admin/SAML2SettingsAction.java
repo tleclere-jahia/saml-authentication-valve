@@ -18,7 +18,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SAML2SettingsAction extends Action {
+public final class SAML2SettingsAction extends Action {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsAction.class);
     private SAML2SettingsService saml2SettingsService;

@@ -11,7 +11,7 @@ import org.pac4j.saml.client.SAML2ClientConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SAML2Util {
+public final class SAML2Util {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Util.class);
     private static SAML2Client client;

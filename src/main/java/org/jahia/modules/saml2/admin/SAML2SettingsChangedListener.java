@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
-public class SAML2SettingsChangedListener implements ApplicationListener<ApplicationEvent> {
+public final class SAML2SettingsChangedListener implements ApplicationListener<ApplicationEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsChangedListener.class);
     private SAML2SettingsService saml2SettingsService;

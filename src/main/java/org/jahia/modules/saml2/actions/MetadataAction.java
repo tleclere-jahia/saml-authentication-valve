@@ -17,7 +17,7 @@ import org.pac4j.saml.client.SAML2ClientConfiguration;
 import org.pac4j.saml.crypto.KeyStoreCredentialProvider;
 import org.pac4j.saml.metadata.SAML2MetadataGenerator;
 
-public class MetadataAction extends Action {
+public final class MetadataAction extends Action {
 
     private SAML2SettingsService saml2SettingsService;
 

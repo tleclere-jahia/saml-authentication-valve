@@ -7,7 +7,7 @@ import org.jahia.services.render.filter.RenderChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SAML2SettingsFilter extends AbstractFilter {
+public final class SAML2SettingsFilter extends AbstractFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsFilter.class);
     private SAML2SettingsService saml2SettingsService;

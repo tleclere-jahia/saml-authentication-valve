@@ -11,9 +11,10 @@ import org.jahia.services.content.JCRTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SAML2Settings {
+public final class SAML2Settings {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Settings.class);
+    private final String siteKey;
     private boolean enabled;
     private String identityProviderPath;
     private String incomingTargetUrl;
@@ -22,11 +23,12 @@ public class SAML2Settings {
     private String postLoginPath;
     private String privateKeyPass;
     private String relyingPartyIdentifier;
-    private String siteKey;
     private String spMetaDataLocation;
 
+    
     public SAML2Settings(final String siteKey) {
         this.siteKey = siteKey;
+        // TODO: should be getting the value for this property from the JCR
         this.enabled = true;
     }
 

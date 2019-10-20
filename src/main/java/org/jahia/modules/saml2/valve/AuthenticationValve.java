@@ -34,7 +34,7 @@ import org.pac4j.saml.profile.SAML2Profile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AuthenticationValve extends AutoRegisteredBaseAuthValve {
+public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationValve.class);
     private static final String CMS_PREFIX = "/cms";

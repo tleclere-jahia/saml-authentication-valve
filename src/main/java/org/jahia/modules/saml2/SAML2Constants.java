@@ -1,6 +1,6 @@
 package org.jahia.modules.saml2;
 
-public class SAML2Constants {
+public final class SAML2Constants {
 
     public static final String ENABLED = "enabled";
     public static final String IDENTITY_PROVIDER_URL = "identityProviderPath";
@@ -24,4 +24,7 @@ public class SAML2Constants {
     public static final String SETTINGS_SAML2_SP_META_DATA_LOCATION = "saml2:spMetaDataLocation";
     public static final String SITE = "site";
     public static final String SP_META_DATA_LOCATION = "spMetaDataLocation";
+
+    private SAML2Constants() {
+    }
 }
