@@ -47,9 +47,10 @@ public class SAML2Util {
         if (StringUtils.isEmpty(serverName)) {
             serverName = request.getServerName();
         }
-        url.append("http://").append(serverName);
+        url.append(request.getScheme()).append("://").append(serverName).append(incoming);
+        
 
-        return "http://" + serverName + incoming;
+        return url.toString();
     }
 
     /**
