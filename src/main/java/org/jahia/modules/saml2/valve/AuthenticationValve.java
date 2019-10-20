@@ -109,6 +109,7 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 // Get the redirection URL from the cookie, if not set takes the value is taken from the site settings
                 String redirection = retrieveRedirectUrl(request);
                 response.sendRedirect(redirection);
+                return;
             });
         }
         valveContext.invokeNext(context);
