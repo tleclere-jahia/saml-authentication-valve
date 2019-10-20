@@ -94,10 +94,15 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 SAML2Util.initialize(() -> {
                     // Storing redirect url into cookie to be used when the request is send from IDP to continue the
                     // access to the secure resource
-                    response.addCookie(new Cookie(REDIRECT, request.getParameter(REDIRECT).replaceAll("\n\r", "")));
-                    response.addCookie(new Cookie(siteKey, request.getParameter(SAML2Constants.SITE).replaceAll("\n\r", "")));
-
-                    final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request);
+                    final String redirectParam = request.getParameter(REDIRECT);
+                    if (redirectParam != null) {
+                        response.addCookie(new Cookie(REDIRECT, redirectParam.replaceAll("\n\r", "")));
+                    }
+                    final String siteParam = request.getParameter(SAML2Constants.SITE);
+                    if (siteParam != null) {
+                        response.addCookie(new Cookie(siteKey, siteParam.replaceAll("\n\r", "")));
+                    }
+                    final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request, siteKey);
                     final J2EContext webContext = new J2EContext(request, response);
                     final HttpAction action = client.redirect(webContext);
                     response.getWriter().flush();
@@ -105,7 +110,7 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 });
             } else if (isSAMLIncomingLoginProcess) {
                 SAML2Util.initialize(() -> {
-                    final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request);
+                    final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request, siteKey);
                     final J2EContext webContext = new J2EContext(request, response);
                     final SAML2Credentials saml2Credentials = client.getCredentials(webContext);
                     final SAML2Profile saml2Profile = client.getUserProfile(saml2Credentials, webContext);
