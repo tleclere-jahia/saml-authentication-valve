@@ -1,10 +1,15 @@
 package org.jahia.modules.saml2;
 
+import java.io.File;
+import javax.jcr.RepositoryException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.saml2.admin.SAML2Settings;
 import org.jahia.modules.saml2.admin.SAML2SettingsService;
+import org.jahia.services.content.JCRCallback;
+import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.services.content.JCRTemplate;
 import org.opensaml.core.config.InitializationService;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
@@ -75,34 +80,9 @@ public final class SAML2Util {
             final HttpServletRequest request, String siteKey) {
         final SAML2Settings saml2Settings = saml2SettingsService.getSettings(siteKey);
         if (client == null) {
-            initSAMLClient(saml2Settings, request);
+            initSAMLClient(saml2Settings, request, siteKey);
         }
         return client;
-    }
-
-    /**
-     * New method to Initializing saml client.
-     *
-     * @param saml2Settings
-     * @param request
-     */
-    private static void initSAMLClient(SAML2Settings saml2Settings, HttpServletRequest request) {
-        // TODO: refactor code to get a method to generation the SAML2ClientConfiguration object
-        final SAML2ClientConfiguration saml2ClientConfiguration = new SAML2ClientConfiguration();
-        // TODO: add this parameter to the valve configuration in the JCR
-        saml2ClientConfiguration.setMaximumAuthenticationLifetime(18000);
-        // TODO: set the IdentityProviderMetadata file from the JCR
-        saml2ClientConfiguration.setIdentityProviderMetadataPath(saml2Settings.getIdentityProviderPath());
-        saml2ClientConfiguration.setServiceProviderEntityId(saml2Settings.getRelyingPartyIdentifier());
-        // TODO: set the Keystore file from the JCR
-        saml2ClientConfiguration.setKeystorePath(saml2Settings.getKeyStoreLocation());
-        saml2ClientConfiguration.setKeystorePassword(saml2Settings.getKeyStorePass());
-        saml2ClientConfiguration.setPrivateKeyPassword(saml2Settings.getPrivateKeyPass());
-        // TODO: set the ServiceProviderMetadata file from the JCR
-        saml2ClientConfiguration.setServiceProviderMetadataPath(saml2Settings.getSpMetaDataLocation());
-
-        client = new SAML2Client(saml2ClientConfiguration);
-        client.setCallbackUrl(SAML2Util.getAssertionConsumerServiceUrl(request, saml2Settings.getIncomingTargetUrl()));
     }
 
     public static String getCookieValue(final HttpServletRequest request,
@@ -122,5 +102,39 @@ public final class SAML2Util {
      */
     public static void resetClient() {
         client = null;
+    }
+
+    public static SAML2ClientConfiguration getSAML2ClientConfiguration(SAML2Settings saml2Settings, String siteKey) {
+        final SAML2ClientConfiguration saml2ClientConfiguration = new SAML2ClientConfiguration();
+
+        try {
+            JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Boolean>() {
+                public Boolean doInJCR(final JCRSessionWrapper session) {
+                    // TODO: add this parameter to the valve configuration in the JCR
+                    saml2ClientConfiguration.setMaximumAuthenticationLifetime(18000);
+                    saml2ClientConfiguration.setIdentityProviderMetadataResource(new JCRResource(saml2Settings.getIdentityProviderPath()));
+                    saml2ClientConfiguration.setServiceProviderEntityId(saml2Settings.getRelyingPartyIdentifier());
+                    saml2ClientConfiguration.setKeystoreResource(new JCRResource(saml2Settings.getKeyStoreLocation()));
+                    saml2ClientConfiguration.setKeystorePassword(saml2Settings.getKeyStorePass());
+                    saml2ClientConfiguration.setPrivateKeyPassword(saml2Settings.getPrivateKeyPass());
+                    saml2ClientConfiguration.setServiceProviderMetadataPath(saml2Settings.getSpMetaDataLocation());
+                    return true;
+                }
+            });
+        } catch (RepositoryException ex) {
+            LOGGER.error("Impossible to retrieve SAMLK2ClientConfiguration", ex);
+        }
+        return saml2ClientConfiguration;
+    }
+
+    /**
+     * New method to Initializing saml client.
+     *
+     * @param saml2Settings
+     * @param request
+     */
+    private static void initSAMLClient(SAML2Settings saml2Settings, HttpServletRequest request, String siteKey) {
+        client = new SAML2Client(getSAML2ClientConfiguration(saml2Settings, siteKey));
+        client.setCallbackUrl(SAML2Util.getAssertionConsumerServiceUrl(request, saml2Settings.getIncomingTargetUrl()));
     }
 }

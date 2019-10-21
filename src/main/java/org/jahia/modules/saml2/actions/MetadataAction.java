@@ -12,7 +12,6 @@ import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
-import org.pac4j.core.util.CommonHelper;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
 import org.pac4j.saml.crypto.KeyStoreCredentialProvider;
 import org.pac4j.saml.metadata.SAML2MetadataGenerator;
@@ -35,23 +34,17 @@ public final class MetadataAction extends Action {
             final String siteKey = renderContext.getSite().getSiteKey();
             final SAML2Settings saml2Settings = saml2SettingsService.getSettings(siteKey);
 
-            // TODO: refactor code to get a method to generation the SAML2ClientConfiguration object
-            final SAML2ClientConfiguration saml2ClientConfiguration = new SAML2ClientConfiguration();
-            // TODO: set the IdentityProviderMetadata file from the JCR
-            saml2ClientConfiguration.setIdentityProviderMetadataPath(saml2Settings.getIdentityProviderPath());
-            saml2ClientConfiguration.setServiceProviderEntityId(saml2Settings.getRelyingPartyIdentifier());
-            // TODO: set the Keystore file from the JCR
-            saml2ClientConfiguration.setKeystoreResource(CommonHelper.getResource(saml2Settings.getKeyStoreLocation()));
-            saml2ClientConfiguration.setKeystorePassword(saml2Settings.getKeyStorePass());
-            saml2ClientConfiguration.setPrivateKeyPassword(saml2Settings.getPrivateKeyPass());
-
+            final SAML2ClientConfiguration saml2ClientConfiguration = SAML2Util.getSAML2ClientConfiguration(saml2Settings, siteKey);
             final KeyStoreCredentialProvider keyStoreCredentialProvider = new KeyStoreCredentialProvider(saml2ClientConfiguration);
-            final SAML2MetadataGenerator saml2MetadataGenerator = new SAML2MetadataGenerator();
+            final SAML2MetadataGenerator saml2MetadataGenerator = new SAML2MetadataGenerator(null);
             saml2MetadataGenerator.setEntityId(saml2Settings.getRelyingPartyIdentifier());
             saml2MetadataGenerator.setAssertionConsumerServiceUrl(SAML2Util.getAssertionConsumerServiceUrl(req, saml2Settings.getIncomingTargetUrl()));
             saml2MetadataGenerator.setCredentialProvider(keyStoreCredentialProvider);
 
-            renderContext.getResponse().getWriter().append(saml2MetadataGenerator.getMetadata());
+            renderContext.getResponse().getWriter().append(
+                    saml2MetadataGenerator.getMetadata(saml2MetadataGenerator.buildEntityDescriptor())
+            );
+
         });
         return ActionResult.OK;
     }

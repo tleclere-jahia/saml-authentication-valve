@@ -39,7 +39,7 @@ public final class SAML2SettingsService implements InitializingBean, JahiaModule
 
     public void loadSettings(final String siteKey) throws RepositoryException {
         JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Object>() {
-            
+
             @Override
             public Object doInJCR(final JCRSessionWrapper session) throws RepositoryException {
                 //clean up
