@@ -10,6 +10,7 @@ import javax.jcr.RepositoryException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.bin.Login;
@@ -168,9 +169,8 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                 this.sessionWrapper.save();
             }
         } else {
-            // TODO: generate random password
             ssoUserNode = jahiaUserManagerService.createUser(email, siteKey,
-                    "SAH-1*", this.initialProperties(saml2Profile), this.sessionWrapper);
+                    RandomStringUtils.randomAscii(18), this.initialProperties(saml2Profile), this.sessionWrapper);
             this.sessionWrapper.save();
         }
         return ssoUserNode;
