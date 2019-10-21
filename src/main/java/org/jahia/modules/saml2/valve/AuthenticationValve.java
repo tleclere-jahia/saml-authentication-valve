@@ -69,25 +69,26 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
         final String siteKey = ServerNameToSiteMapper.getSiteKeyByServerName(request);
 
         boolean enabled = false;
-        try {
-            enabled = JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Boolean>() {
-                @Override
-                public Boolean doInJCR(JCRSessionWrapper session) {
-                    try {
-                        final JahiaSitesService siteService = JahiaSitesService.getInstance();
-                        final JahiaSite site = siteService.getSiteByKey(siteKey, session);
-                        final List<String> installedModules = site.getInstalledModules();
-                        return installedModules.contains("saml-authentication-valve");
-                    } catch (RepositoryException ex) {
-                        LOGGER.error("Impossible to verify the current site", ex);
+        if (!StringUtils.isEmpty(siteKey)) {
+            try {
+                enabled = JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Boolean>() {
+                    @Override
+                    public Boolean doInJCR(JCRSessionWrapper session) {
+                        try {
+                            final JahiaSitesService siteService = JahiaSitesService.getInstance();
+                            final JahiaSite site = siteService.getSiteByKey(siteKey, session);
+                            final List<String> installedModules = site.getInstalledModules();
+                            return installedModules.contains("saml-authentication-valve");
+                        } catch (RepositoryException ex) {
+                            LOGGER.error("Impossible to verify the current site", ex);
+                        }
+                        return false;
                     }
-                    return false;
-                }
-            });
-        } catch (RepositoryException ex) {
-            LOGGER.error(String.format("Impossible to check if the SAML is enabled for %s"), siteKey);
+                });
+            } catch (RepositoryException ex) {
+                LOGGER.error(String.format("Impossible to check if the SAML is enabled for %s"), siteKey);
+            }
         }
-
         if (enabled) {
 
             // This is the starting process of the SAML authentication which redirects the user to the IDP login screen
