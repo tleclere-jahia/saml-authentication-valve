@@ -126,6 +126,8 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                         final JahiaUser jahiaUser = jahiaUserNode.getJahiaUser();
                         if (jahiaUser.isAccountLocked()) {
                             LOGGER.info("Login failed. Account is locked for user " + email);
+                            valveContext.invokeNext(context);
+                            return;
                         }
                         authContext.getSessionFactory().setCurrentUser(jahiaUser);
                         request.getSession().setAttribute(Constants.SESSION_USER, jahiaUser);
