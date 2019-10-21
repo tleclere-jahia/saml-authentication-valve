@@ -131,13 +131,15 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                         }
                         authContext.getSessionFactory().setCurrentUser(jahiaUser);
                         request.getSession().setAttribute(Constants.SESSION_USER, jahiaUser);
+
+                        request.setAttribute(LoginEngineAuthValveImpl.VALVE_RESULT, LoginEngineAuthValveImpl.OK);
+
+                        // Get the redirection URL from the cookie, if not set takes the value is taken from the site settings
+                        String redirection = retrieveRedirectUrl(request, siteKey);
+                        response.sendRedirect(redirection);
+                    } else {
+                        valveContext.invokeNext(context);
                     }
-
-                    request.setAttribute(LoginEngineAuthValveImpl.VALVE_RESULT, LoginEngineAuthValveImpl.OK);
-
-                    // Get the redirection URL from the cookie, if not set takes the value is taken from the site settings
-                    String redirection = retrieveRedirectUrl(request, siteKey);
-                    response.sendRedirect(redirection);
                     return;
                 });
             }
