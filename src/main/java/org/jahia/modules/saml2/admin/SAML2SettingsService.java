@@ -19,6 +19,7 @@ import org.jahia.services.templates.JahiaModuleAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
 
 public final class SAML2SettingsService implements InitializingBean, JahiaModuleAware {
 
@@ -119,16 +120,16 @@ public final class SAML2SettingsService implements InitializingBean, JahiaModule
     public void setJahiaModule(final JahiaTemplatesPackage jahiaTemplatesPackage) {
         this.module = jahiaTemplatesPackage;
 
-        final org.springframework.core.io.Resource[] resources;
+        final Resource[] resources;
         final String rbName = module.getResourceBundleName();
         if (rbName != null) {
             resourceBundleName = StringUtils.substringAfterLast(rbName, ".") + "-i18n";
             resources = module.getResources("javascript/i18n");
             supportedLocales = new HashSet<>();
-            for (final org.springframework.core.io.Resource resource : resources) {
-                final String f = resource.getFilename();
-                if (f.startsWith(resourceBundleName)) {
-                    final String l = StringUtils.substringBetween(f, resourceBundleName, ".js");
+            for (final Resource resource : resources) {
+                final String fileName = resource.getFilename();
+                if (fileName.startsWith(resourceBundleName)) {
+                    final String l = StringUtils.substringBetween(fileName, resourceBundleName, ".js");
                     supportedLocales.add(l.length() > 0 ? StringUtils.substringAfter(l, "_") : StringUtils.EMPTY);
                 }
             }

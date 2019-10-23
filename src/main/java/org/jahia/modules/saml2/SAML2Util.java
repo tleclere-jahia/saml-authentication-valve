@@ -1,6 +1,5 @@
 package org.jahia.modules.saml2;
 
-import java.io.File;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -49,7 +48,7 @@ public final class SAML2Util {
         if (StringUtils.isEmpty(serverName)) {
             serverName = request.getServerName();
         }
-        url.append(request.getScheme()).append("://").append(serverName).append(incoming);
+        url.append(request.getScheme()).append("://").append(serverName).append(request.getContextPath()).append(incoming);
 
         return url.toString();
     }

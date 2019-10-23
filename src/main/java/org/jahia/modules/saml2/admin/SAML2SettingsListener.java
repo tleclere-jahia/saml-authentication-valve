@@ -3,6 +3,7 @@ package org.jahia.modules.saml2.admin;
 import javax.jcr.observation.Event;
 import javax.jcr.observation.EventIterator;
 import org.jahia.modules.saml2.SAML2Constants;
+import org.jahia.modules.saml2.admin.SAML2SettingsChangedListener.SAML2SettingsChangedEvent;
 import org.jahia.services.content.DefaultEventListener;
 import org.jahia.services.content.ExternalEventListener;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public final class SAML2SettingsListener extends DefaultEventListener implements
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Firing off SAML2SettingsChangedEvent");
         }
-        applicationEventPublisher.publishEvent(new SAML2SettingsChangedListener.SAML2SettingsChangedEvent(events));
+        applicationEventPublisher.publishEvent(new SAML2SettingsChangedEvent(events));
     }
 
     public void setApplicationEventPublisher(final ApplicationEventPublisher applicationEventPublisher) {

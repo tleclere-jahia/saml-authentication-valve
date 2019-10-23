@@ -58,12 +58,6 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
         final HttpServletRequest request = authContext.getRequest();
         final HttpServletResponse response = authContext.getResponse();
 
-        final boolean isSAMLLoginProcess = CMS_PREFIX.equals(request.getServletPath())
-                && (Login.getMapping()).equals(request.getPathInfo());
-
-        final boolean isSAMLIncomingLoginProcess = CMS_PREFIX.equals(request.getServletPath())
-                && (Login.getMapping() + ".SAML.incoming").equals(request.getPathInfo());
-
         // Récupération de la siteKey passée en paramètre
         final String siteKey = ServerNameToSiteMapper.getSiteKeyByServerName(request);
 
@@ -89,8 +83,13 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
             }
         }
         if (enabled) {
+            final boolean isSAMLLoginProcess = CMS_PREFIX.equals(request.getServletPath())
+                    && (Login.getMapping()).equals(request.getPathInfo());
+            // TODO: retrive value from settings
+//            final boolean isSAMLIncomingLoginProcess = CMS_PREFIX.equals(request.getServletPath())
+//                    && (Login.getMapping() + ".SAML.incoming").equals(request.getPathInfo());
 
-            // This is the starting process of the SAML authentication which redirects the user to the IDP login screen
+            final boolean isSAMLIncomingLoginProcess = request.getRequestURI().equals(request.getContextPath() + saml2SettingsService.getSettings(siteKey).getIncomingTargetUrl());
             if (isSAMLLoginProcess) {
                 SAML2Util.initialize(() -> {
                     // Storing redirect url into cookie to be used when the request is send from IDP to continue the
@@ -248,7 +247,7 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
     private String retrieveRedirectUrl(HttpServletRequest request, String siteKey) {
         String redirection = SAML2Util.getCookieValue(request, REDIRECT);
         if (StringUtils.isEmpty(redirection)) {
-            redirection = this.saml2SettingsService.getSettings(siteKey).getPostLoginPath();
+            redirection = request.getContextPath() + this.saml2SettingsService.getSettings(siteKey).getPostLoginPath();
             if (StringUtils.isEmpty(redirection)) {
                 // default value
                 redirection = "/";
