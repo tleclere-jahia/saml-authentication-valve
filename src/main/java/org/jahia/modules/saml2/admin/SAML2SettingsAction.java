@@ -1,29 +1,10 @@
-/**
- * ==========================================================================================
- * =                            JAHIA'S ENTERPRISE DISTRIBUTION                             =
- * ==========================================================================================
- * <p>
- * http://www.jahia.com
- * <p>
- * JAHIA'S ENTERPRISE DISTRIBUTIONS LICENSING - IMPORTANT INFORMATION
- * ==========================================================================================
- * <p>
- * Copyright (C) 2002-2016 Jahia Solutions Group. All rights reserved.
- * <p>
- * This file is part of a Jahia's Enterprise Distribution.
- * <p>
- * Jahia's Enterprise Distributions must be used in accordance with the terms
- * contained in the Jahia Solutions Group Terms & Conditions as well as
- * the Jahia Sustainable Enterprise License (JSEL).
- * <p>
- * For questions regarding licensing, support, production usage...
- * please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
- * <p>
- * ==========================================================================================
- */
 package org.jahia.modules.saml2.admin;
 
 import com.google.common.io.CharStreams;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
@@ -37,33 +18,17 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Map;
-
-public class SAML2SettingsAction extends Action {
+public final class SAML2SettingsAction extends Action {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsAction.class);
     private SAML2SettingsService saml2SettingsService;
 
-    /**
-     *
-     * @param request
-     * @param renderContext
-     * @param resource
-     * @param session
-     * @param parameters
-     * @param urlResolver
-     * @return
-     * @throws Exception
-     */
     @Override
     public ActionResult doExecute(final HttpServletRequest request,
-                                  final RenderContext renderContext,
-                                  final Resource resource,
-                                  final JCRSessionWrapper session, Map<String, List<String>> parameters,
-                                  final URLResolver urlResolver) throws Exception {
+            final RenderContext renderContext,
+            final Resource resource,
+            final JCRSessionWrapper session, Map<String, List<String>> parameters,
+            final URLResolver urlResolver) throws Exception {
         try {
             final String responseText = CharStreams.toString(request.getReader());
             final JSONObject settings;
@@ -91,10 +56,12 @@ public class SAML2SettingsAction extends Action {
                         (oldSettings != null ? oldSettings.getPrivateKeyPass() : ""));
                 final String postLoginPath = getSettingOrDefault(settings, SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH,
                         (oldSettings != null ? oldSettings.getPostLoginPath() : ""));
+                final Double maximumAuthenticationLifetime = getSettingOrDefaultDouble(settings, SAML2Constants.SETTINGS_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME,
+                        (oldSettings != null ? oldSettings.getMaximumAuthenticationLifetime() : new Double(0)));
                 if (enabled) {
                     serverSettings = saml2SettingsService.setSAML2Settings(siteKey,
                             identityProviderPath, relyingPartyIdentifier, incomingTargetUrl,
-                            spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass,postLoginPath);
+                            spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass, postLoginPath, maximumAuthenticationLifetime);
                 } else {
                     serverSettings = null;
                 }
@@ -111,6 +78,7 @@ public class SAML2SettingsAction extends Action {
                 resp.put(SAML2Constants.SP_META_DATA_LOCATION, serverSettings.getSpMetaDataLocation());
                 resp.put(SAML2Constants.KEY_STORE_LOCATION, serverSettings.getKeyStoreLocation());
                 resp.put(SAML2Constants.KEY_STORE_PASS, serverSettings.getKeyStorePass());
+                resp.put(SAML2Constants.SETTINGS_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME, serverSettings.getMaximumAuthenticationLifetime());
                 resp.put(SAML2Constants.PRIVATE_KEY_PASS, serverSettings.getPrivateKeyPass());
                 resp.put(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH, serverSettings.getPostLoginPath());
             }
@@ -127,25 +95,18 @@ public class SAML2SettingsAction extends Action {
         }
     }
 
-    /**
-     *
-     * @param settings
-     * @param propertyName
-     * @param defaultValue
-     * @param <T>
-     * @return
-     * @throws JSONException
-     */
     private <T> T getSettingOrDefault(final JSONObject settings,
-                                      final String propertyName,
-                                      final T defaultValue) throws JSONException {
+            final String propertyName,
+            final T defaultValue) throws JSONException {
         return settings.has(propertyName) ? (T) settings.get(propertyName) : defaultValue;
     }
 
-    /**
-     *
-     * @param saml2SettingsService
-     */
+    private Double getSettingOrDefaultDouble(final JSONObject settings,
+            final String propertyName,
+            final Double defaultValue) throws JSONException {
+        return settings.has(propertyName) ? settings.getDouble(propertyName) : defaultValue;
+    }
+
     public void setSaml2SettingsService(final SAML2SettingsService saml2SettingsService) {
         this.saml2SettingsService = saml2SettingsService;
     }

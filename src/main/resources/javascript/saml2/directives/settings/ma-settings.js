@@ -83,6 +83,9 @@ angular.module('jahia.saml2')
               if(!$scope.settings.loginSuccessPath) {
                 return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.loginSuccessPath');
               }
+              if(!$scope.settings.maximumAuthenticationLifetime) {
+                return i18nService.message('angular.saml2.directives.settings.ma-settings.validate.message.maximumAuthenticationLifetime');
+              }
 
             }
 

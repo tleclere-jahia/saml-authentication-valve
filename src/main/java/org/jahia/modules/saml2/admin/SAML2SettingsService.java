@@ -1,8 +1,16 @@
 package org.jahia.modules.saml2.admin;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.jcr.RepositoryException;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.saml2.SAML2Constants;
+import org.jahia.modules.saml2.SAML2Util;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
@@ -12,51 +20,29 @@ import org.jahia.services.templates.JahiaModuleAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
 
-import javax.jcr.RepositoryException;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+public final class SAML2SettingsService implements InitializingBean, JahiaModuleAware {
 
-public class SAML2SettingsService implements InitializingBean, JahiaModuleAware {
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2SettingsService.class);
-    private static final SAML2SettingsService instance = new SAML2SettingsService();
+    private static final SAML2SettingsService INSTANCE = new SAML2SettingsService();
     private Map<String, SAML2Settings> settingsBySiteKeyMap = new HashMap<>();
     private String resourceBundleName;
     private JahiaTemplatesPackage module;
     private Set<String> supportedLocales = Collections.emptySet();
+    private SAML2Util util;           
 
-    /**
-     *
-     */
     private SAML2SettingsService() {
         super();
     }
 
-    /**
-     *
-     * @return
-     */
     public static SAML2SettingsService getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
-    /**
-     * @param siteKey
-     * @throws RepositoryException
-     */
     public void loadSettings(final String siteKey) throws RepositoryException {
         JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Object>() {
 
-            /**
-             *
-             * @param session
-             * @return
-             * @throws RepositoryException
-             */
             @Override
             public Object doInJCR(final JCRSessionWrapper session) throws RepositoryException {
                 //clean up
@@ -74,15 +60,10 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
                 return null;
             }
 
-            /**
-             *
-             * @param siteNode
-             * @throws RepositoryException
-             */
             private void loadSettings(final JCRSiteNode siteNode) throws RepositoryException {
                 boolean loaded;
                 try {
-                    final SAML2Settings settings = new SAML2Settings(siteNode.getSiteKey());
+                    final SAML2Settings settings = new SAML2Settings(siteNode.getSiteKey(), util);
                     loaded = settings.load();
                     if (loaded) {
                         settingsBySiteKeyMap.put(siteNode.getSiteKey(), settings);
@@ -96,29 +77,17 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         });
     }
 
-    /**
-     *
-     * @param siteKey
-     * @param identityProviderPath
-     * @param relyingPartyIdentifier
-     * @param incomingTargetUrl
-     * @param spMetaDataLocation
-     * @param keyStoreLocation
-     * @param keyStorePass
-     * @param privateKeyPass
-     * @return
-     * @throws IOException
-     */
     public SAML2Settings setSAML2Settings(final String siteKey,
-                                          final String identityProviderPath,
-                                          final String relyingPartyIdentifier,
-                                          final String incomingTargetUrl,
-                                          final String spMetaDataLocation,
-                                          final String keyStoreLocation,
-                                          final String keyStorePass,
-                                          final String privateKeyPass,
-                                          final String postLoginPath) throws IOException {
-        final SAML2Settings settings = new SAML2Settings(siteKey);
+            final String identityProviderPath,
+            final String relyingPartyIdentifier,
+            final String incomingTargetUrl,
+            final String spMetaDataLocation,
+            final String keyStoreLocation,
+            final String keyStorePass,
+            final String privateKeyPass,
+            final String postLoginPath,
+            final Double maximumAuthentifcationLifetime) throws IOException {
+        final SAML2Settings settings = new SAML2Settings(siteKey, util);
         settings.setIdentityProviderPath(identityProviderPath);
         settings.setRelyingPartyIdentifier(relyingPartyIdentifier);
         settings.setIncomingTargetUrl(incomingTargetUrl);
@@ -127,6 +96,7 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         settings.setKeyStorePass(keyStorePass);
         settings.setPrivateKeyPass(privateKeyPass);
         settings.setPostLoginPath(postLoginPath);
+        settings.setMaximumAuthenticationLifetime(maximumAuthentifcationLifetime);
 
         // refresh and save settings
         settings.store();
@@ -135,10 +105,6 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         return settings;
     }
 
-    /**
-     *
-     * @param siteKey
-     */
     public void removeServerSettings(String siteKey) {
         if (settingsBySiteKeyMap.containsKey(siteKey)) {
             settingsBySiteKeyMap.get(siteKey).remove();
@@ -154,52 +120,40 @@ public class SAML2SettingsService implements InitializingBean, JahiaModuleAware 
         return settingsBySiteKeyMap.get(siteKey);
     }
 
-    /**
-     *
-     * @param jahiaTemplatesPackage
-     */
     @Override
     public void setJahiaModule(final JahiaTemplatesPackage jahiaTemplatesPackage) {
         this.module = jahiaTemplatesPackage;
 
-        final org.springframework.core.io.Resource[] resources;
+        final Resource[] resources;
         final String rbName = module.getResourceBundleName();
         if (rbName != null) {
             resourceBundleName = StringUtils.substringAfterLast(rbName, ".") + "-i18n";
             resources = module.getResources("javascript/i18n");
             supportedLocales = new HashSet<>();
-            for (final org.springframework.core.io.Resource resource : resources) {
-                final String f = resource.getFilename();
-                if (f.startsWith(resourceBundleName)) {
-                    final String l = StringUtils.substringBetween(f, resourceBundleName, ".js");
+            for (final Resource resource : resources) {
+                final String fileName = resource.getFilename();
+                if (fileName.startsWith(resourceBundleName)) {
+                    final String l = StringUtils.substringBetween(fileName, resourceBundleName, ".js");
                     supportedLocales.add(l.length() > 0 ? StringUtils.substringAfter(l, "_") : StringUtils.EMPTY);
                 }
             }
         }
     }
 
-    /**
-     *
-     * @return
-     */
     public Set<String> getSupportedLocales() {
-        return supportedLocales;
+        return Collections.unmodifiableSet(supportedLocales);
     }
 
-    /**
-     *
-     * @return
-     */
     public String getResourceBundleName() {
         return resourceBundleName;
     }
 
-    /**
-     *
-     * @throws Exception
-     */
     @Override
     public void afterPropertiesSet() throws Exception {
         loadSettings(null);
+    }
+
+    public void setUtil(SAML2Util util) {
+        this.util = util;
     }
 }
