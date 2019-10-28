@@ -19,6 +19,7 @@ import org.pac4j.saml.metadata.SAML2MetadataGenerator;
 public final class MetadataAction extends Action {
 
     private SAML2SettingsService saml2SettingsService;
+    private SAML2Util util;
 
     @Override
     public ActionResult doExecute(final HttpServletRequest req,
@@ -30,15 +31,15 @@ public final class MetadataAction extends Action {
         if (renderContext.getSite() == null) {
             return ActionResult.OK;
         }
-        SAML2Util.initialize(() -> {
+        util.initialize(() -> {
             final String siteKey = renderContext.getSite().getSiteKey();
             final SAML2Settings saml2Settings = saml2SettingsService.getSettings(siteKey);
 
-            final SAML2ClientConfiguration saml2ClientConfiguration = SAML2Util.getSAML2ClientConfiguration(saml2Settings, siteKey);
+            final SAML2ClientConfiguration saml2ClientConfiguration = util.getSAML2ClientConfiguration(saml2Settings, siteKey);
             final KeyStoreCredentialProvider keyStoreCredentialProvider = new KeyStoreCredentialProvider(saml2ClientConfiguration);
             final SAML2MetadataGenerator saml2MetadataGenerator = new SAML2MetadataGenerator(null);
             saml2MetadataGenerator.setEntityId(saml2Settings.getRelyingPartyIdentifier());
-            saml2MetadataGenerator.setAssertionConsumerServiceUrl(SAML2Util.getAssertionConsumerServiceUrl(req, saml2Settings.getIncomingTargetUrl()));
+            saml2MetadataGenerator.setAssertionConsumerServiceUrl(util.getAssertionConsumerServiceUrl(req, saml2Settings.getIncomingTargetUrl()));
             saml2MetadataGenerator.setCredentialProvider(keyStoreCredentialProvider);
 
             renderContext.getResponse().getWriter().append(
@@ -51,5 +52,9 @@ public final class MetadataAction extends Action {
 
     public void setSaml2SettingsService(SAML2SettingsService saml2SettingsService) {
         this.saml2SettingsService = saml2SettingsService;
+    }
+
+    public void setUtil(SAML2Util util) {
+        this.util = util;
     }
 }

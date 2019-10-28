@@ -16,6 +16,7 @@ public final class SAML2Settings {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Settings.class);
     private final String siteKey;
+    private final SAML2Util util;
     private boolean enabled;
     private String identityProviderPath;
     private String incomingTargetUrl;
@@ -26,11 +27,11 @@ public final class SAML2Settings {
     private String relyingPartyIdentifier;
     private String spMetaDataLocation;
 
-    
-    public SAML2Settings(final String siteKey) {
+    public SAML2Settings(final String siteKey, SAML2Util util) {
         this.siteKey = siteKey;
         // TODO: should be getting the value for this property from the JCR
         this.enabled = true;
+        this.util = util;
     }
 
     public void remove() {
@@ -146,7 +147,7 @@ public final class SAML2Settings {
         } catch (RepositoryException e) {
             LOGGER.error("Error storing settings into the repository.", e);
         }
-        SAML2Util.resetClient(siteKey);
+        util.resetClient(siteKey);
     }
 
     private boolean setProperty(final JCRNodeWrapper node,
@@ -236,5 +237,4 @@ public final class SAML2Settings {
     public void setPostLoginPath(String postLoginPath) {
         this.postLoginPath = postLoginPath;
     }
-
 }

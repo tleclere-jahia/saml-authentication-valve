@@ -50,6 +50,7 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
     private SAML2SettingsService saml2SettingsService;
     private JCRSessionWrapper sessionWrapper;
     private JahiaUserManagerService jahiaUserManagerService;
+    private SAML2Util util;
 
     @Override
     public void invoke(final Object context,
@@ -88,7 +89,7 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
 
             final boolean isSAMLIncomingLoginProcess = request.getRequestURI().equals(request.getContextPath() + saml2SettingsService.getSettings(siteKey).getIncomingTargetUrl());
             if (isSAMLLoginProcess) {
-                SAML2Util.initialize(() -> {
+                util.initialize(() -> {
                     // Storing redirect url into cookie to be used when the request is send from IDP to continue the
                     // access to the secure resource
                     final String redirectParam = request.getParameter(REDIRECT);
@@ -99,15 +100,15 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                     if (siteParam != null) {
                         response.addCookie(new Cookie(siteKey, siteParam.replaceAll("\n\r", "")));
                     }
-                    final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request, siteKey);
+                    final SAML2Client client = util.getSAML2Client(saml2SettingsService, request, siteKey);
                     final J2EContext webContext = new J2EContext(request, response);
                     final HttpAction action = client.redirect(webContext);
                     response.getWriter().flush();
                     LOGGER.info(action.getMessage());
                 });
             } else if (isSAMLIncomingLoginProcess) {
-                SAML2Util.initialize(() -> {
-                    final SAML2Client client = SAML2Util.getSAML2Client(saml2SettingsService, request, siteKey);
+                util.initialize(() -> {
+                    final SAML2Client client = util.getSAML2Client(saml2SettingsService, request, siteKey);
                     final J2EContext webContext = new J2EContext(request, response);
                     final SAML2Credentials saml2Credentials = client.getCredentials(webContext);
                     final SAML2Profile saml2Profile = client.getUserProfile(saml2Credentials, webContext);
@@ -242,7 +243,7 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
      * @return the redirection URL
      */
     private String retrieveRedirectUrl(HttpServletRequest request, String siteKey) {
-        String redirection = SAML2Util.getCookieValue(request, REDIRECT);
+        String redirection = util.getCookieValue(request, REDIRECT);
         if (StringUtils.isEmpty(redirection)) {
             redirection = request.getContextPath() + this.saml2SettingsService.getSettings(siteKey).getPostLoginPath();
             if (StringUtils.isEmpty(redirection)) {
@@ -260,5 +261,9 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
 
     public void setJahiaUserManagerService(JahiaUserManagerService jahiaUserManagerService) {
         this.jahiaUserManagerService = jahiaUserManagerService;
+    }
+
+    public void setUtil(SAML2Util util) {
+        this.util = util;
     }
 }

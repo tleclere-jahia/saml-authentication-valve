@@ -10,6 +10,7 @@ import javax.jcr.RepositoryException;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.saml2.SAML2Constants;
+import org.jahia.modules.saml2.SAML2Util;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
@@ -29,6 +30,7 @@ public final class SAML2SettingsService implements InitializingBean, JahiaModule
     private String resourceBundleName;
     private JahiaTemplatesPackage module;
     private Set<String> supportedLocales = Collections.emptySet();
+    private SAML2Util util;           
 
     private SAML2SettingsService() {
         super();
@@ -61,7 +63,7 @@ public final class SAML2SettingsService implements InitializingBean, JahiaModule
             private void loadSettings(final JCRSiteNode siteNode) throws RepositoryException {
                 boolean loaded;
                 try {
-                    final SAML2Settings settings = new SAML2Settings(siteNode.getSiteKey());
+                    final SAML2Settings settings = new SAML2Settings(siteNode.getSiteKey(), util);
                     loaded = settings.load();
                     if (loaded) {
                         settingsBySiteKeyMap.put(siteNode.getSiteKey(), settings);
@@ -84,7 +86,7 @@ public final class SAML2SettingsService implements InitializingBean, JahiaModule
             final String keyStorePass,
             final String privateKeyPass,
             final String postLoginPath) throws IOException {
-        final SAML2Settings settings = new SAML2Settings(siteKey);
+        final SAML2Settings settings = new SAML2Settings(siteKey, util);
         settings.setIdentityProviderPath(identityProviderPath);
         settings.setRelyingPartyIdentifier(relyingPartyIdentifier);
         settings.setIncomingTargetUrl(incomingTargetUrl);
@@ -147,5 +149,9 @@ public final class SAML2SettingsService implements InitializingBean, JahiaModule
     @Override
     public void afterPropertiesSet() throws Exception {
         loadSettings(null);
+    }
+
+    public void setUtil(SAML2Util util) {
+        this.util = util;
     }
 }
