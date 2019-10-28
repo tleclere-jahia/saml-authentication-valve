@@ -95,8 +95,7 @@ public final class SAML2Util {
         try {
             JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Boolean>() {
                 public Boolean doInJCR(final JCRSessionWrapper session) {
-                    // TODO: add this parameter to the valve configuration in the JCR
-                    saml2ClientConfiguration.setMaximumAuthenticationLifetime(18000);
+                    saml2ClientConfiguration.setMaximumAuthenticationLifetime(saml2Settings.getMaximumAuthenticationLifetime().intValue());
                     saml2ClientConfiguration.setIdentityProviderMetadataResource(new JCRResource(saml2Settings.getIdentityProviderPath()));
                     saml2ClientConfiguration.setServiceProviderEntityId(saml2Settings.getRelyingPartyIdentifier());
                     saml2ClientConfiguration.setKeystoreResource(new JCRResource(saml2Settings.getKeyStoreLocation()));

@@ -25,6 +25,10 @@
           <span message-key="saml2nt_settings.saml2_enabled"></span>
         </md-checkbox>
         <md-input-container class="md-block" flex>
+          <label message-key="saml2nt_settings.saml2_maximumAuthenticationLifetime"></label>
+          <input ng-model="settings.maximumAuthenticationLifetime">
+        </md-input-container>
+        <md-input-container class="md-block" flex>
           <label message-key="saml2nt_settings.saml2_identityProviderPath"></label>
           <input ng-model="settings.identityProviderPath">
         </md-input-container>

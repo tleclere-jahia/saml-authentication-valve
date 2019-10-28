@@ -26,6 +26,7 @@ public final class SAML2Settings {
     private String privateKeyPass;
     private String relyingPartyIdentifier;
     private String spMetaDataLocation;
+    private Double maximumAuthenticationLifetime;
 
     public SAML2Settings(final String siteKey, SAML2Util util) {
         this.siteKey = siteKey;
@@ -94,6 +95,10 @@ public final class SAML2Settings {
                                     postLoginPath = settingsNode
                                             .getProperty(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH).getString();
                                 }
+                                if (settingsNode.hasProperty(SAML2Constants.SETTINGS_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME)) {
+                                    maximumAuthenticationLifetime = settingsNode
+                                            .getProperty(SAML2Constants.SETTINGS_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME).getDouble();
+                                }
                                 return Boolean.TRUE;
                             }
                             return Boolean.FALSE;
@@ -137,6 +142,8 @@ public final class SAML2Settings {
                                     getPrivateKeyPass());
                             doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH,
                                     getPostLoginPath());
+                            doSave |= setProperty(settingsNode, SAML2Constants.SETTINGS_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME,
+                                    String.valueOf(getMaximumAuthenticationLifetime()));
 
                             if (doSave) {
                                 session.save();
@@ -236,5 +243,13 @@ public final class SAML2Settings {
 
     public void setPostLoginPath(String postLoginPath) {
         this.postLoginPath = postLoginPath;
+    }
+
+    public Double getMaximumAuthenticationLifetime() {
+        return maximumAuthenticationLifetime;
+    }
+
+    public void setMaximumAuthenticationLifetime(Double maximumAuthenticationLifetime) {
+        this.maximumAuthenticationLifetime = maximumAuthenticationLifetime;
     }
 }

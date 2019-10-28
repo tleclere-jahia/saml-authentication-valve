@@ -85,7 +85,8 @@ public final class SAML2SettingsService implements InitializingBean, JahiaModule
             final String keyStoreLocation,
             final String keyStorePass,
             final String privateKeyPass,
-            final String postLoginPath) throws IOException {
+            final String postLoginPath,
+            final Double maximumAuthentifcationLifetime) throws IOException {
         final SAML2Settings settings = new SAML2Settings(siteKey, util);
         settings.setIdentityProviderPath(identityProviderPath);
         settings.setRelyingPartyIdentifier(relyingPartyIdentifier);
@@ -95,6 +96,7 @@ public final class SAML2SettingsService implements InitializingBean, JahiaModule
         settings.setKeyStorePass(keyStorePass);
         settings.setPrivateKeyPass(privateKeyPass);
         settings.setPostLoginPath(postLoginPath);
+        settings.setMaximumAuthenticationLifetime(maximumAuthentifcationLifetime);
 
         // refresh and save settings
         settings.store();

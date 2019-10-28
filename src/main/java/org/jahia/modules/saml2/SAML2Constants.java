@@ -18,6 +18,7 @@ public final class SAML2Constants {
     public static final String SETTINGS_SAML2_INCOMMING_TARGET_URL = "saml2:incomingTargetUrl";
     public static final String SETTINGS_SAML2_KEY_STORE_LOCATION = "saml2:keyStoreLocation";
     public static final String SETTINGS_SAML2_KEY_STORE_PASS = "saml2:keyStorePass";
+    public static final String SETTINGS_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME = "maximumAuthenticationLifetime";
     public static final String SETTINGS_SAML2_POST_LOGIN_PATH = "loginSuccessPath";
     public static final String SETTINGS_SAML2_PRIVATE_KEY_PASS = "saml2:privateKeyPass";
     public static final String SETTINGS_SAML2_RELYING_PARTY_IDENTIFIER = "saml2:relyingPartyIdentifier";

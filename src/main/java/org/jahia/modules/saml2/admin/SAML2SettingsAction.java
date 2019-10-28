@@ -56,10 +56,12 @@ public final class SAML2SettingsAction extends Action {
                         (oldSettings != null ? oldSettings.getPrivateKeyPass() : ""));
                 final String postLoginPath = getSettingOrDefault(settings, SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH,
                         (oldSettings != null ? oldSettings.getPostLoginPath() : ""));
+                final Double maximumAuthenticationLifetime = getSettingOrDefaultDouble(settings, SAML2Constants.SETTINGS_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME,
+                        (oldSettings != null ? oldSettings.getMaximumAuthenticationLifetime() : new Double(0)));
                 if (enabled) {
                     serverSettings = saml2SettingsService.setSAML2Settings(siteKey,
                             identityProviderPath, relyingPartyIdentifier, incomingTargetUrl,
-                            spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass, postLoginPath);
+                            spMetaDataLocation, keyStoreLocation, keyStorePass, privateKeyPass, postLoginPath, maximumAuthenticationLifetime);
                 } else {
                     serverSettings = null;
                 }
@@ -76,6 +78,7 @@ public final class SAML2SettingsAction extends Action {
                 resp.put(SAML2Constants.SP_META_DATA_LOCATION, serverSettings.getSpMetaDataLocation());
                 resp.put(SAML2Constants.KEY_STORE_LOCATION, serverSettings.getKeyStoreLocation());
                 resp.put(SAML2Constants.KEY_STORE_PASS, serverSettings.getKeyStorePass());
+                resp.put(SAML2Constants.SETTINGS_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME, serverSettings.getMaximumAuthenticationLifetime());
                 resp.put(SAML2Constants.PRIVATE_KEY_PASS, serverSettings.getPrivateKeyPass());
                 resp.put(SAML2Constants.SETTINGS_SAML2_POST_LOGIN_PATH, serverSettings.getPostLoginPath());
             }
@@ -96,6 +99,12 @@ public final class SAML2SettingsAction extends Action {
             final String propertyName,
             final T defaultValue) throws JSONException {
         return settings.has(propertyName) ? (T) settings.get(propertyName) : defaultValue;
+    }
+
+    private Double getSettingOrDefaultDouble(final JSONObject settings,
+            final String propertyName,
+            final Double defaultValue) throws JSONException {
+        return settings.has(propertyName) ? settings.getDouble(propertyName) : defaultValue;
     }
 
     public void setSaml2SettingsService(final SAML2SettingsService saml2SettingsService) {
