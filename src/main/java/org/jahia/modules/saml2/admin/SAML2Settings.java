@@ -4,6 +4,7 @@ import javax.jcr.RepositoryException;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.modules.saml2.SAML2Constants;
+import org.jahia.modules.saml2.SAML2Util;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -145,6 +146,7 @@ public final class SAML2Settings {
         } catch (RepositoryException e) {
             LOGGER.error("Error storing settings into the repository.", e);
         }
+        SAML2Util.resetClient();
     }
 
     private boolean setProperty(final JCRNodeWrapper node,

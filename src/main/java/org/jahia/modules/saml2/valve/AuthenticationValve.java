@@ -79,15 +79,12 @@ public final class AuthenticationValve extends AutoRegisteredBaseAuthValve {
                     }
                 });
             } catch (RepositoryException ex) {
-                LOGGER.error(String.format("Impossible to check if the SAML is enabled for %s"), siteKey);
+                LOGGER.error(String.format("Impossible to check if the SAML is enabled for %s", siteKey), ex);
             }
         }
         if (enabled) {
             final boolean isSAMLLoginProcess = CMS_PREFIX.equals(request.getServletPath())
                     && (Login.getMapping()).equals(request.getPathInfo());
-            // TODO: retrive value from settings
-//            final boolean isSAMLIncomingLoginProcess = CMS_PREFIX.equals(request.getServletPath())
-//                    && (Login.getMapping() + ".SAML.incoming").equals(request.getPathInfo());
 
             final boolean isSAMLIncomingLoginProcess = request.getRequestURI().equals(request.getContextPath() + saml2SettingsService.getSettings(siteKey).getIncomingTargetUrl());
             if (isSAMLLoginProcess) {
