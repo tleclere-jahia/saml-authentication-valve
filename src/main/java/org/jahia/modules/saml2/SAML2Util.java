@@ -1,5 +1,6 @@
 package org.jahia.modules.saml2;
 
+import java.io.File;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -133,6 +134,13 @@ public final class SAML2Util {
      * @param request
      */
     private static void initSAMLClient(SAML2Settings saml2Settings, HttpServletRequest request, String siteKey) {
+        final String spMetaDataLocation = saml2Settings.getSpMetaDataLocation();
+        if (spMetaDataLocation != null) {
+            final File spMetadataFile = new File(spMetaDataLocation);
+            if (spMetadataFile.exists()) {
+                spMetadataFile.delete();
+            }
+        }
         client = new SAML2Client(getSAML2ClientConfiguration(saml2Settings, siteKey));
         client.setCallbackUrl(SAML2Util.getAssertionConsumerServiceUrl(request, saml2Settings.getIncomingTargetUrl()));
     }
