@@ -146,7 +146,7 @@ public final class SAML2Settings {
         } catch (RepositoryException e) {
             LOGGER.error("Error storing settings into the repository.", e);
         }
-        SAML2Util.resetClient();
+        SAML2Util.resetClient(siteKey);
     }
 
     private boolean setProperty(final JCRNodeWrapper node,
