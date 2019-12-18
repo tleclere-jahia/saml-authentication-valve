@@ -8,6 +8,12 @@ Create a keystore:
 ```sh
 keytool -genkeypair -alias jahiakeystorealias -keypass changeit -keystore sp.jks -storepass changeit -keyalg RSA -keysize 2048 -validity 3650
 ```
+
+#### :warning: Important Input Step :warning:
+- What is your first and last name?: ***jahia.server.name***
+
+***This value must match your Jahia site domain name***
+
   then upload it in your website thanks to the Document manager and publish it.
   
 ## Valve Configuration
