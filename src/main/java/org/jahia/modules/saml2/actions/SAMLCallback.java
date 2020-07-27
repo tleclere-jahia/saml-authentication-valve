@@ -18,8 +18,6 @@ import org.pac4j.core.context.J2EContext;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.credentials.SAML2Credentials;
 import org.pac4j.saml.profile.SAML2Profile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,8 +29,6 @@ import static org.jahia.modules.jahiaoauth.service.JahiaOAuthConstants.PROPERTY_
 import static org.jahia.modules.jahiaoauth.service.JahiaOAuthConstants.PROPERTY_VALUE_TYPE;
 
 public class SAMLCallback extends Action {
-    private static final Logger logger = LoggerFactory.getLogger(SAMLCallback.class);
-
     private static final String REDIRECT = "redirect";
 
     private SAML2SettingsService saml2SettingsService;
