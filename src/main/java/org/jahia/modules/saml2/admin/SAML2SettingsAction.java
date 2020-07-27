@@ -3,13 +3,18 @@ package org.jahia.modules.saml2.admin;
 import org.apache.commons.io.FileUtils;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
+import org.jahia.exceptions.JahiaRuntimeException;
+import org.jahia.modules.jahiaoauth.service.JahiaOAuthConstants;
+import org.jahia.modules.jahiaoauth.service.MapperService;
 import org.jahia.modules.saml2.SAML2Constants;
+import org.jahia.osgi.FrameworkService;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.jahia.tools.files.FileUpload;
 import org.json.JSONObject;
+import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +25,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class SAML2SettingsAction extends Action {
 
@@ -49,7 +55,9 @@ public final class SAML2SettingsAction extends Action {
                 resp.put(SAML2Constants.MAXIMUM_AUTHENTICATION_LIFETIME, serverSettings.getMaximumAuthenticationLifetime());
                 resp.put(SAML2Constants.PRIVATE_KEY_PASS, serverSettings.getPrivateKeyPass());
                 resp.put(SAML2Constants.POST_LOGIN_PATH, serverSettings.getPostLoginPath());
+                resp.put(SAML2Constants.MAPPER_NAME, serverSettings.getMapperName());
             }
+            resp.put("availableMappers", getMapperNames());
             resp.put("noConf", serverSettings == null);
             return new ActionResult(HttpServletResponse.SC_OK, null, resp);
         } catch (Exception e) {
@@ -60,6 +68,17 @@ public final class SAML2SettingsAction extends Action {
             error.put("error", e.getMessage());
             error.put("type", e.getClass().getSimpleName());
             return new ActionResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null, error);
+        }
+    }
+
+    public List<String> getMapperNames() {
+        try {
+            return FrameworkService.getBundleContext().getServiceReferences(MapperService.class, null).stream()
+                    .filter(ref -> ref.getProperty(JahiaOAuthConstants.MAPPER_SERVICE_NAME) != null)
+                    .map(ref -> (String) ref.getProperty(JahiaOAuthConstants.MAPPER_SERVICE_NAME))
+                    .collect(Collectors.toList());
+        } catch (InvalidSyntaxException e) {
+            throw new JahiaRuntimeException(e);
         }
     }
 
@@ -83,6 +102,7 @@ public final class SAML2SettingsAction extends Action {
         serverSettings.setPrivateKeyPass(getSettingOrDefault(parameters, SAML2Constants.PRIVATE_KEY_PASS, (oldSettings != null ? oldSettings.getPrivateKeyPass() : "")));
         serverSettings.setPostLoginPath(getSettingOrDefault(parameters, SAML2Constants.POST_LOGIN_PATH, (oldSettings != null ? oldSettings.getPostLoginPath() : "")));
         serverSettings.setMaximumAuthenticationLifetime(Long.parseLong(getSettingOrDefault(parameters, SAML2Constants.MAXIMUM_AUTHENTICATION_LIFETIME, Long.toString(oldSettings != null ? oldSettings.getMaximumAuthenticationLifetime() : 0))));
+        serverSettings.setMapperName(getSettingOrDefault(parameters, SAML2Constants.MAPPER_NAME, (oldSettings != null ? oldSettings.getMapperName() : "")));
         saml2SettingsService.saveSAML2Settings(serverSettings);
         return serverSettings;
     }

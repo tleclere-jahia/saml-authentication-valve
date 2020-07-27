@@ -77,6 +77,7 @@ public final class SAML2SettingsService implements JahiaModuleAware {
         setProperty(properties, writer, SAML2Constants.PRIVATE_KEY_PASS, settings.getPrivateKeyPass());
         setProperty(properties, writer, SAML2Constants.INCOMING_TARGET_URL, settings.getIncomingTargetUrl());
         setProperty(properties, writer, SAML2Constants.POST_LOGIN_PATH, settings.getPostLoginPath());
+        setProperty(properties, writer, SAML2Constants.MAPPER_NAME, settings.getMapperName());
         setProperty(properties, writer, SAML2Constants.MAXIMUM_AUTHENTICATION_LIFETIME, Long.toString(settings.getMaximumAuthenticationLifetime()));
     }
 

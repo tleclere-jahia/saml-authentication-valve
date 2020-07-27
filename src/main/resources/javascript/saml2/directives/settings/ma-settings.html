@@ -55,5 +55,13 @@
             <label message-key="angular.saml2.directives.settings.ma-settings.maximumAuthenticationLifetime"></label>
             <input ng-model="settings.maximumAuthenticationLifetime">
         </md-input-container>
+        <md-input-container class="md-block" flex>
+            <label message-key="angular.saml2.directives.settings.ma-settings.mapperName"></label>
+            <md-select ng-model="settings.mapperName">
+                <md-option ng-repeat="mapper in settings.availableMappers" ng-value="mapper">
+                    {{ mapper }}
+                </md-option>
+            </md-select>
+        </md-input-container>
     </md-card-content>
 </md-card>
