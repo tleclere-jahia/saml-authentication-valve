@@ -15,6 +15,7 @@ public final class SAML2Settings {
     private String privateKeyPass;
     private String relyingPartyIdentifier;
     private Long maximumAuthenticationLifetime;
+    private String mapperName;
 
     public void init() {
         saml2SettingsService.registerServerSettings(this);
@@ -115,6 +116,14 @@ public final class SAML2Settings {
 
     public void setSaml2SettingsService(SAML2SettingsService saml2SettingsService) {
         this.saml2SettingsService = saml2SettingsService;
+    }
+
+    public String getMapperName() {
+        return mapperName;
+    }
+
+    public void setMapperName(String mapperName) {
+        this.mapperName = mapperName;
     }
 }
 
