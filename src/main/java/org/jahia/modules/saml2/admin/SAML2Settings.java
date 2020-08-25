@@ -1,21 +1,33 @@
 package org.jahia.modules.saml2.admin;
 
+import org.opensaml.saml.common.xml.SAMLConstants;
+
+import java.io.File;
 import java.util.Map;
 
 public final class SAML2Settings {
     private String previousSiteKey;
     private String siteKey;
     private SAML2SettingsService saml2SettingsService;
-    private boolean enabled;
+    private boolean enabled = false;
     private String identityProviderMetadata;
-    private String incomingTargetUrl;
+    private File identityProviderMetadataFile;
+    private String incomingTargetUrl = "/home.samlCallback.do";
     private String keyStore;
-    private String keyStorePass;
-    private String postLoginPath;
-    private String privateKeyPass;
+    private File keyStoreFile;
+    private String keyStoreType = "JKS";
+    private String keyStoreAlias = "saml2clientconfiguration";
+    private String keyStorePass = "changeit";
+    private String privateKeyPass = "changeit";
+    private String postLoginPath = "/";
     private String relyingPartyIdentifier;
-    private Long maximumAuthenticationLifetime;
-    private String mapperName;
+    private Long maximumAuthenticationLifetime = 86400L;
+    private boolean forceAuth = false;
+    private boolean passive = false;
+    private boolean signAuthnRequest = true;
+    private boolean requireSignedAssertions = false;
+    private String bindingType = SAMLConstants.SAML2_POST_BINDING_URI;
+    private String mapperName = "default";
 
     public void init() {
         saml2SettingsService.registerServerSettings(this);
@@ -50,6 +62,14 @@ public final class SAML2Settings {
         this.identityProviderMetadata = identityProviderMetadata;
     }
 
+    public File getIdentityProviderMetadataFile() {
+        return identityProviderMetadataFile;
+    }
+
+    public void setIdentityProviderMetadataFile(File identityProviderMetadataFile) {
+        this.identityProviderMetadataFile = identityProviderMetadataFile;
+    }
+
     public String getRelyingPartyIdentifier() {
         return relyingPartyIdentifier;
     }
@@ -72,6 +92,33 @@ public final class SAML2Settings {
 
     public void setKeyStore(final String keyStore) {
         this.keyStore = keyStore;
+    }
+
+    public File getKeyStoreFile() {
+        return keyStoreFile;
+    }
+
+    public void setKeyStoreFile(File keyStoreFile) {
+        this.keyStoreFile = keyStoreFile;
+    }
+
+    public String getKeyStoreType() {
+        return keyStoreType;
+    }
+
+    public void setKeyStoreType(String keyStoreType) {
+        if (!keyStoreType.equals(this.keyStoreType)) {
+            keyStore = null;
+        }
+        this.keyStoreType = keyStoreType;
+    }
+
+    public String getKeyStoreAlias() {
+        return keyStoreAlias;
+    }
+
+    public void setKeyStoreAlias(String keyStoreAlias) {
+        this.keyStoreAlias = keyStoreAlias;
     }
 
     public String getKeyStorePass() {
@@ -114,8 +161,44 @@ public final class SAML2Settings {
         this.maximumAuthenticationLifetime = maximumAuthenticationLifetime;
     }
 
-    public void setSaml2SettingsService(SAML2SettingsService saml2SettingsService) {
-        this.saml2SettingsService = saml2SettingsService;
+    public boolean isForceAuth() {
+        return forceAuth;
+    }
+
+    public void setForceAuth(boolean forceAuth) {
+        this.forceAuth = forceAuth;
+    }
+
+    public boolean isPassive() {
+        return passive;
+    }
+
+    public void setPassive(boolean passive) {
+        this.passive = passive;
+    }
+
+    public boolean isSignAuthnRequest() {
+        return signAuthnRequest;
+    }
+
+    public void setSignAuthnRequest(boolean signAuthnRequest) {
+        this.signAuthnRequest = signAuthnRequest;
+    }
+
+    public boolean isRequireSignedAssertions() {
+        return requireSignedAssertions;
+    }
+
+    public void setRequireSignedAssertions(boolean requireSignedAssertions) {
+        this.requireSignedAssertions = requireSignedAssertions;
+    }
+
+    public String getBindingType() {
+        return bindingType;
+    }
+
+    public void setBindingType(String bindingType) {
+        this.bindingType = bindingType;
     }
 
     public String getMapperName() {
@@ -125,5 +208,10 @@ public final class SAML2Settings {
     public void setMapperName(String mapperName) {
         this.mapperName = mapperName;
     }
+
+    public void setSaml2SettingsService(SAML2SettingsService saml2SettingsService) {
+        this.saml2SettingsService = saml2SettingsService;
+    }
+
 }
 
