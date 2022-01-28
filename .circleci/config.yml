@@ -109,6 +109,7 @@ workflows:
             - jahia-modules-orb/build
       - jahia-modules-orb/publish:
           context: QA_ENVIRONMENT
+          base_image: cimg/openjdk:11.0-node
           requires:
             - jahia-modules-orb/build
           filters:
