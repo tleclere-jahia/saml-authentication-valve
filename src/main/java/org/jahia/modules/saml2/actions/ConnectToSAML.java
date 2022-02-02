@@ -12,7 +12,6 @@ import org.jahia.services.render.URLResolver;
 import org.jahia.utils.ClassLoaderUtils;
 import org.opensaml.core.config.InitializationService;
 import org.pac4j.core.context.JEEContext;
-import org.pac4j.core.context.session.JEESessionStore;
 import org.pac4j.core.exception.http.FoundAction;
 import org.pac4j.core.exception.http.OkAction;
 import org.pac4j.core.exception.http.RedirectionAction;
@@ -57,7 +56,7 @@ public class ConnectToSAML extends Action {
             }
             final SAML2Client client = util.getSAML2Client(settingsService, request, siteKey);
             JEEContext webContext = new JEEContext(request, response);
-            final Optional<RedirectionAction> action = client.getRedirectionAction(webContext, JEESessionStore.INSTANCE);
+            final Optional<RedirectionAction> action = client.getRedirectionAction(webContext);
             if (action.isPresent()) {
                 RedirectionAction redirectionAction = action.get();
                 try {
