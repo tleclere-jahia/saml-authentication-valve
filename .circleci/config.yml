@@ -108,7 +108,7 @@ workflows:
           context: QA_ENVIRONMENT
           primary_release_branch: << pipeline.parameters.PRIMARY_RELEASE_BRANCH >>
           github_slug: << pipeline.parameters.GITHUB_SLUG >>
-          owasp_suppression_files: << pipeline.OWASP_SUPPRESSION_FILES >>
+          owasp_suppression_files: << pipeline.parameters.OWASP_SUPPRESSION_FILES >>
           requires:
             - jahia-modules-orb/build
       - jahia-modules-orb/publish:
