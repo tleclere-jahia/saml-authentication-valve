@@ -33,7 +33,7 @@ parameters:
     default: "jahia/saml-authentication-valve"
   PRIMARY_RELEASE_BRANCH:
     type: string
-    default: "master" # main or master ? set the branch for the main release
+    default: "2_x" # main or master ? set the branch for the main release
   JAHIA_IMAGE:
     type: string
     default: "jahia/jahia-ee-dev:8-SNAPSHOT"
@@ -73,6 +73,9 @@ parameters:
   IS_MANUAL_TESTRUN: # Was the workflow triggered by an API call ?
     type: boolean
     default: false
+  OWASP_SUPPRESSION_FILES: # Comma separated list of filenames with suppression definitions for the OWASP dependency check
+    type: string
+    default: ".circleci/owasp-suppressions.xml"
 
 workflows:
   # On code change is executed each time new code is pushed to a branch
@@ -105,6 +108,7 @@ workflows:
           context: QA_ENVIRONMENT
           primary_release_branch: << pipeline.parameters.PRIMARY_RELEASE_BRANCH >>
           github_slug: << pipeline.parameters.GITHUB_SLUG >>
+          owasp_suppression_files: << pipeline.parameters.OWASP_SUPPRESSION_FILES >>
           requires:
             - jahia-modules-orb/build
       - jahia-modules-orb/publish:
