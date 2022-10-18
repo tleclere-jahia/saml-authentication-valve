@@ -59,7 +59,6 @@ public class SAMLCallback extends Action {
                             return false;
                         }
                     }
-
                     ConnectorConfig config = settingsService.getConnectorConfig(siteKey, "Saml");
                     jahiaAuthMapperService.executeConnectorResultProcessors(config, properties);
 
@@ -82,8 +81,10 @@ public class SAMLCallback extends Action {
         for (Map.Entry<String, Object> entry : saml2Profile.getAttributes().entrySet()) {
             if (entry.getValue() instanceof List) {
                 final List<?> l = (List<?>) entry.getValue();
-                if (l.size() > 0) {
+                if (l.size() == 1) {
                     properties.put(entry.getKey(), l.get(0));
+                } else {
+                    properties.put(entry.getKey(), entry.getValue());
                 }
             } else {
                 properties.put(entry.getKey(), entry.getValue());
