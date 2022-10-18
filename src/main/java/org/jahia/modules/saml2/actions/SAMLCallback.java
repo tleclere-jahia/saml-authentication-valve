@@ -60,6 +60,9 @@ public class SAMLCallback extends Action {
                         }
                     }
 
+                    ConnectorConfig config = settingsService.getConnectorConfig(siteKey, "Saml");
+                    jahiaAuthMapperService.executeConnectorResultProcessors(config, properties);
+
                     return true;
                 }
                 return false;
