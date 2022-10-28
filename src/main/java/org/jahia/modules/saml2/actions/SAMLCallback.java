@@ -3,7 +3,11 @@ package org.jahia.modules.saml2.actions;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
-import org.jahia.modules.jahiaauth.service.*;
+import org.jahia.modules.jahiaauth.service.ConnectorConfig;
+import org.jahia.modules.jahiaauth.service.JahiaAuthException;
+import org.jahia.modules.jahiaauth.service.JahiaAuthMapperService;
+import org.jahia.modules.jahiaauth.service.MapperConfig;
+import org.jahia.modules.jahiaauth.service.SettingsService;
 import org.jahia.modules.saml2.SAML2Constants;
 import org.jahia.modules.saml2.SAML2Util;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -50,7 +54,7 @@ public class SAMLCallback extends Action {
                 ConnectorConfig settings = settingsService.getConnectorConfig(siteKey, "Saml");
 
                 if (saml2Profile.isPresent()) {
-                    Map<String, Object> properties = getMapperResult((BasicUserProfile)saml2Profile.get());
+                    Map<String, Object> properties = getMapperResult((BasicUserProfile) saml2Profile.get());
 
                     for (MapperConfig mapper : settings.getMappers()) {
                         try {
@@ -59,8 +63,7 @@ public class SAMLCallback extends Action {
                             return false;
                         }
                     }
-                    ConnectorConfig config = settingsService.getConnectorConfig(siteKey, "Saml");
-                    jahiaAuthMapperService.executeConnectorResultProcessors(config, properties);
+                    jahiaAuthMapperService.executeConnectorResultProcessors(settings, properties);
 
                     return true;
                 }
